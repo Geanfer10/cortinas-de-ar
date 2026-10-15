@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Limpeza das Cortinas de Ar</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: "GV·OS" claro — letreiro de avisos verde no topo, faixa de widgets executivos, área de trabalho com janelas
+   (Monitor + Planejamento à esquerda, Agenda à direita) e barra de tarefas com relógio. Tema claro único, pensado para TV. */
+:root{
+  --desk:#e9efea; --win:#ffffff; --win-2:#f5f8f5; --titlebar:#f7faf7; --line:#d9e3db; --line-2:#e8eee9;
+  --ink:#14241a; --muted:#5f7065; --brand:#0f7a3d; --brand-2:#0b5e2f;
+  --ok:#1e9350; --warn:#c77a0c; --bad:#cf3a33; --off:#6b7480; --none:#2e6fd9;
+  --serie:#2e6fd9; --serie-plan:#a9c4f0;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--desk);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.4;
+  background-image:radial-gradient(1100px 520px at 100% 100%,rgba(15,122,61,.10),transparent 60%),
+                   linear-gradient(rgba(15,122,61,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(15,122,61,.05) 1px,transparent 1px);
+  background-size:auto,28px 28px,28px 28px}
+.os{height:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+
+/* ===== letreiro de avisos ===== */
+.ticker{display:flex;align-items:stretch;background:var(--brand-2);color:#fff;height:44px;overflow:hidden;
+  padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.ticker-label{flex:none;display:flex;align-items:center;gap:8px;padding:0 16px;background:#08431f;font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:.12em;text-transform:uppercase}
+.pulse{width:9px;height:9px;border-radius:50%;background:#ffd36b;box-shadow:0 0 0 0 rgba(255,211,107,.6)}
+.ticker-view{flex:1;min-width:0;overflow:hidden;display:flex;align-items:center;mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
+.ticker-track{display:flex;white-space:nowrap;will-change:transform}
+.msg{display:inline-flex;align-items:center;gap:8px;padding:0 22px;font-size:16px}
+.msg::after{content:"";width:6px;height:6px;transform:rotate(45deg);background:rgba(255,255,255,.35);margin-left:22px}
+.msg b{font-family:var(--f-num);font-weight:700}
+.tg{font-family:var(--f-num);font-size:12px;font-weight:700;padding:2px 7px;border-radius:4px;background:#fff;color:var(--c,var(--brand-2))}
+.m-bad{--c:var(--bad)} .m-warn{--c:var(--warn)} .m-off{--c:var(--off)} .m-ok{--c:var(--ok)} .m-info{--c:var(--none)}
+.m-bad .tg{background:#ffd9d6} .m-warn .tg{background:#ffe6bf} .m-info .tg{background:#dbe7fb} .m-off .tg{background:#e6e9ec}
+@keyframes rolar{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes pulsar{70%{box-shadow:0 0 0 8px rgba(255,211,107,0)}100%{box-shadow:0 0 0 0 rgba(255,211,107,0)}}
+@media (prefers-reduced-motion:no-preference){.pulse{animation:pulsar 1.8s infinite}}
+
+/* ===== widgets executivos ===== */
+.widgets{display:grid;grid-template-columns:1.5fr repeat(4,minmax(0,1fr));gap:14px;padding-block:14px 0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wd{background:var(--win);border:1px solid var(--line);border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;gap:4px;min-width:0;
+  box-shadow:0 6px 18px rgba(20,36,26,.06)}
+.wd-l{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.wd-v{font-family:var(--f-num);font-weight:700;font-size:34px;line-height:1.05;font-variant-numeric:tabular-nums}
+.wd-v small{font-size:16px;color:var(--muted);font-weight:500}
+.wd-s{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wd-s b{color:var(--ink);font-family:var(--f-num)}
+.wd.conf{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 16px;align-items:center}
+.wd.conf .wd-l,.wd.conf .wd-s{grid-column:1/-1}
+.spark{height:46px;width:100%}
+.meter{height:6px;border-radius:3px;background:var(--line-2);overflow:hidden;margin-top:4px}
+.meter i{display:block;height:100%;border-radius:3px;background:var(--serie)}
+.wd.alert-bad .wd-v{color:var(--bad)} .wd.alert-off .wd-v{color:var(--off)}
+
+/* ===== área de trabalho ===== */
+.desktop{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 400px;grid-template-rows:auto minmax(0,1fr);gap:14px;
+  padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#w-agenda{grid-column:2;grid-row:1/3}
+.desktop.has-max .win:not(.max){display:none}
+.desktop.has-max .win.max{grid-column:1/-1;grid-row:1/-1}
+
+.win{min-height:0;min-width:0;display:flex;flex-direction:column;background:var(--win);border:1px solid var(--line);border-radius:10px;
+  box-shadow:0 10px 30px rgba(20,36,26,.08);overflow:hidden}
+.win[hidden]{display:none}
+.titlebar{flex:none;display:flex;align-items:center;gap:10px;padding:7px 8px 7px 12px;background:var(--titlebar);border-bottom:1px solid var(--line)}
+.appicon{flex:none;width:22px;height:22px;border-radius:5px;display:grid;place-items:center;background:var(--brand);color:#fff;font-family:var(--f-num);font-size:10.5px;font-weight:700}
+.wtitle{flex:1;min-width:0;display:flex;align-items:baseline;gap:10px;overflow:hidden;white-space:nowrap}
+.wtitle strong{font-family:var(--f-display);font-weight:600;font-size:17px;letter-spacing:.02em}
+.wtitle span{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.wctl{display:flex;gap:2px}
+.wctl button{width:30px;height:26px;border:0;border-radius:5px;background:transparent;color:var(--muted);cursor:pointer;display:grid;place-items:center}
+.wctl button:hover{background:var(--line-2);color:var(--ink)}
+.wctl button.x:hover{background:#d93c35;color:#fff}
+.wctl svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.6}
+.wbody{flex:1;min-height:0;overflow:auto;padding:14px}
+
+/* filtros (chips) */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--win);cursor:pointer;font-size:13px;color:var(--muted)}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.chip b{font-family:var(--f-num);color:var(--ink)}
+.chip:hover{border-color:var(--c)}
+.chip[aria-pressed="true"]{background:color-mix(in srgb,var(--c) 12%,#fff);border-color:var(--c);color:var(--ink)}
+.c-all{--c:var(--brand)} .c-ok{--c:var(--ok)} .c-warn{--c:var(--warn)} .c-bad{--c:var(--bad)} .c-none{--c:var(--none)} .c-off{--c:var(--off)}
+
+/* cartões */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+@media (min-width:1700px){.grid{grid-template-columns:repeat(7,minmax(0,1fr))}}
+.card{position:relative;background:var(--win);border:1px solid var(--line);border-radius:8px;padding:10px 11px 9px 14px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--c)}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.tag{font-family:var(--f-num);font-weight:700;font-size:19px;white-space:nowrap;flex:none}
+.pill{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:999px;color:var(--c);background:color-mix(in srgb,var(--c) 12%,#fff);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.loc{font-size:13.5px;color:var(--muted);line-height:1.25;min-height:2.5em}
+.dates{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0;border-top:1px solid var(--line-2);padding-top:7px}
+.dates dt{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.dates dd{margin:1px 0 0;font-family:var(--f-num);font-size:14px;font-variant-numeric:tabular-nums}
+.bar{height:5px;border-radius:3px;background:var(--line-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--c);border-radius:3px}
+.foot{display:flex;justify-content:space-between;gap:6px;font-size:12px;color:var(--muted)}
+.foot b{font-family:var(--f-num);color:var(--c)}
+.obs{font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card.c-off{background:var(--win-2)}
+.empty{grid-column:1/-1;padding:26px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:8px}
+
+/* planejamento (gráfico) */
+#w-plan .wbody{display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;background:var(--c)}
+.chart{position:relative;flex:1;min-height:150px}
+.chart svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.chart text{font-family:var(--f-num);font-size:12px;fill:var(--muted)}
+.chart text.val{fill:var(--ink);font-weight:700;font-size:13px}
+.chart text.cur{fill:var(--brand);font-weight:700}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:12.5px;padding:7px 10px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-100%);margin-top:-8px;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.tip b{font-family:var(--f-num)}
+
+/* agenda */
+.agenda{list-style:none;margin:0;padding:0}
+.agenda li{display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line-2)}
+.agenda li:first-child{border-top:0;padding-top:0}
+.day{font-family:var(--f-num);text-align:center;line-height:1.1;border-radius:6px;padding:5px 0;color:var(--c);background:color-mix(in srgb,var(--c) 11%,#fff)}
+.day b{display:block;font-size:17px}
+.day span{font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+.ag-t{font-family:var(--f-num);font-weight:700;font-size:14px}
+.ag-l{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ag-d{font-family:var(--f-num);font-size:12px;font-weight:700;color:var(--c);white-space:nowrap}
+.ag-empty{color:var(--muted);font-size:14px;padding:4px 0}
+.sub{margin:18px 0 8px;font-family:var(--f-display);font-weight:600;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+.pend{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.pend li{display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:start}
+.tag-s{font-family:var(--f-num);font-weight:700;font-size:13px;text-align:center;padding:3px 0;border-radius:5px;color:var(--c);background:color-mix(in srgb,var(--c) 11%,#fff)}
+.pl{font-size:13px;min-width:0}
+.pl small{display:block;color:var(--muted);font-size:12px}
+.reg li{grid-template-columns:58px minmax(0,1fr) auto}
+.reg .when{font-family:var(--f-num);font-size:12px;color:var(--muted);white-space:nowrap}
+.link{display:inline-block;margin-top:16px;font-size:13px;color:var(--brand);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px}
+.link:hover{border-color:var(--brand)}
+
+/* ===== barra de tarefas ===== */
+.taskbar{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.94);border-top:1px solid var(--line);
+  padding-block:6px calc(6px + env(safe-area-inset-bottom,0px));padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+.start{flex:none;display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:7px;background:var(--win-2);border:1px solid var(--line)}
+.start i{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#19a05a,var(--brand-2));display:grid;place-items:center;font-style:normal;color:#fff;font-family:var(--f-display);font-weight:700;font-size:15px}
+.start span{font-family:var(--f-display);font-weight:600;font-size:15px;letter-spacing:.06em}
+.apps{flex:1;min-width:0;display:flex;gap:6px;overflow-x:auto}
+.app{flex:none;padding:6px 12px;border-radius:7px;border:1px solid transparent;background:transparent;cursor:pointer;font-size:13.5px;color:var(--muted);position:relative}
+.app:hover{background:var(--win-2)}
+.app.on{color:var(--ink);background:var(--win-2);border-color:var(--line)}
+.app.on::after{content:"";position:absolute;left:30%;right:30%;bottom:1px;height:2px;border-radius:2px;background:var(--brand)}
+.tray{flex:none;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--muted)}
+.sync{display:flex;align-items:center;gap:7px}
+.sync .d{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.sync.stale .d{background:var(--warn)} .sync.err .d{background:var(--bad)}
+.clock{text-align:right;line-height:1.15}
+.clock b{display:block;font-family:var(--f-num);font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* ===== telas menores ===== */
+@media (max-width:1200px){
+  html,body{height:auto}
+  .os{height:auto;min-height:100%}
+  .widgets{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .wd.conf{grid-column:1/-1}
+  .desktop{grid-template-columns:1fr;grid-template-rows:none}
+  #w-agenda{grid-column:auto;grid-row:auto}
+  .wbody{overflow:visible}
+  #w-plan .wbody{min-height:280px}
+}
+@media (max-width:560px){
+  .wd-v{font-size:26px}
+  .start span,.sync span{display:none}
+  .ticker-label{font-size:14px;padding:0 10px}
+}
+@media (min-width:1800px){body{font-size:16px}.tag{font-size:21px}.loc{font-size:14.5px}.dates dd{font-size:15px}.msg{font-size:18px}.ticker{height:50px}.wd-v{font-size:40px}}
+</style>
+</head>
+<body>
+<div class="os">
+
+  <!-- Letreiro de avisos -->
+  <div class="ticker" role="region" aria-label="Avisos">
+    <div class="ticker-label"><span class="pulse"></span>Avisos</div>
+    <div class="ticker-view"><div class="ticker-track" id="ticker"></div></div>
+  </div>
+
+  <!-- Widgets executivos -->
+  <section class="widgets" aria-label="Indicadores">
+    <div class="wd conf">
+      <span class="wd-l">Conformidade de limpeza</span>
+      <span class="wd-v" id="w-conf">—</span>
+      <svg class="spark" id="spark" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <span class="wd-s" id="w-conf-s">—</span>
+    </div>
+    <div class="wd">
+      <span class="wd-l" id="w-real-l">Realizadas no mês</span>
+      <span class="wd-v" id="w-real">—</span>
+      <div class="meter"><i id="w-real-m" style="width:0"></i></div>
+      <span class="wd-s" id="w-real-s">—</span>
+    </div>
+    <div class="wd" id="wd-venc">
+      <span class="wd-l">Vencidas</span>
+      <span class="wd-v" id="w-venc">—</span>
+      <span class="wd-s" id="w-venc-s">—</span>
+    </div>
+    <div class="wd" id="wd-off">
+      <span class="wd-l">Fora de operação</span>
+      <span class="wd-v" id="w-off">—</span>
+      <span class="wd-s" id="w-off-s">—</span>
+    </div>
+    <div class="wd">
+      <span class="wd-l">Próxima limpeza</span>
+      <span class="wd-v" id="w-prox">—</span>
+      <span class="wd-s" id="w-prox-s">—</span>
+    </div>
+  </section>
+
+  <!-- Área de trabalho -->
+  <main class="desktop" id="desktop">
+
+    <section class="win" id="w-monitor" aria-labelledby="t-monitor">
+      <div class="titlebar">
+        <span class="appicon">CA</span>
+        <div class="wtitle"><strong id="t-monitor">Monitor de Limpeza — Cortinas de Ar</strong><span id="mon-sub">—</span></div>
+        <div class="wctl" data-win="w-monitor"></div>
+      </div>
+      <div class="wbody">
+        <div class="chips" id="chips" role="group" aria-label="Filtrar por estado"></div>
+        <div class="grid" id="grid"></div>
+      </div>
+    </section>
+
+    <section class="win" id="w-plan" aria-labelledby="t-plan">
+      <div class="titlebar">
+        <span class="appicon">PL</span>
+        <div class="wtitle"><strong id="t-plan">Planejamento de Limpezas</strong><span>Realizadas nos últimos meses e previstas para os próximos</span></div>
+        <div class="wctl" data-win="w-plan"></div>
+      </div>
+      <div class="wbody">
+        <div class="legend">
+          <span style="--c:var(--serie)"><i></i>Realizadas (registradas no Monday)</span>
+          <span style="--c:var(--serie-plan)"><i></i>Previstas pela periodicidade</span>
+        </div>
+        <div class="chart" id="chart"><svg id="chart-svg" role="img" aria-label="Limpezas por mês"></svg><div class="tip" id="tip" hidden></div></div>
+      </div>
+    </section>
+
+    <section class="win" id="w-agenda" aria-labelledby="t-agenda">
+      <div class="titlebar">
+        <span class="appicon">AG</span>
+        <div class="wtitle"><strong id="t-agenda">Agenda</strong><span>Próximos 30 dias e pendências</span></div>
+        <div class="wctl" data-win="w-agenda"></div>
+      </div>
+      <div class="wbody">
+        <ul class="agenda" id="agenda"></ul>
+        <div id="pend"></div>
+        <div id="ultimas"></div>
+        <a class="link" id="board-link" href="https://messigean18s-team.monday.com/boards/18435679675" target="_blank" rel="noopener">Abrir quadro no Monday ↗</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Barra de tarefas -->
+  <footer class="taskbar">
+    <div class="start" title="Goiás Verde · PCM"><i>GV</i><span>PCM · OS</span></div>
+    <nav class="apps" id="apps" aria-label="Janelas"></nav>
+    <div class="tray">
+      <div class="sync" id="sync"><span class="d"></span><span id="sync-t">Monday …</span></div>
+      <div class="clock"><b id="clk-h">--:--:--</b><span id="clk-d">--/--/----</span></div>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* ================= Configuração ================= */
+const DATA_URL = "data/latest.json";
+const HIST_URL = "data/historico.json";
+const ALERTA_DIAS = 10;          // "A vencer" quando faltam 10 dias ou menos
+const RECARREGAR_MIN = 5;        // busca os dados de novo a cada 5 min
+const DADOS_VELHOS_H = 3;        // avisa se os dados tiverem mais de 3 h
+const MESES_ATRAS = 4, MESES_FRENTE = 7;   // janela do gráfico de planejamento
+const JANELAS = [
+  {id:"w-monitor", nome:"Monitor"},
+  {id:"w-plan",    nome:"Planejamento"},
+  {id:"w-agenda",  nome:"Agenda"},
+];
+
+/* ================= Utilidades ================= */
+const $ = id => document.getElementById(id);
+const DIA = 864e5;
+const DSEM = ["dom","seg","ter","qua","qui","sex","sáb"];
+const MES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+const MES_LONGO = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hoje = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
+const parseData = s => { if(!s) return null; const [y,m,d] = s.slice(0,10).split("-").map(Number); return new Date(y,m-1,d); };
+const fmt = d => d ? d.toLocaleDateString("pt-BR") : "—";
+const fmtC = d => d ? d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"2-digit"}) : "—";
+const ddmm = d => `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}`;
+const plural = (n,s,p) => `${n} ${n===1?s:p}`;
+const chaveMes = d => d.getFullYear()*12 + d.getMonth();
+
+const ESTADOS = {
+  all: {l:"Todas",            c:"c-all"},
+  bad: {l:"Vencidas",         c:"c-bad"},
+  warn:{l:"A vencer",         c:"c-warn"},
+  ok:  {l:"Em dia",           c:"c-ok"},
+  none:{l:"Sem registro",     c:"c-none"},
+  off: {l:"Fora de operação", c:"c-off"},
+};
+const ROTULO = {ok:"Em dia", warn:"A vencer", bad:"Vencida", none:"Sem registro"};
+
+let DADOS = null, HIST = {limpezas:[], fotos:[]}, filtro = "all", erroCarga = false, LISTA = [];
+
+/* ================= Regras ================= */
+function avaliar(c){
+  const H = hoje();
+  const periodo = Number(c.periodicidade) || 60;
+  const ult = parseData(c.ultima_limpeza);
+  const prox = parseData(c.proxima_limpeza) || (ult ? new Date(ult.getTime() + periodo*DIA) : null);
+  const falta = prox ? Math.round((prox - H)/DIA) : null;
+  const futura = ult && ult > H;
+  let est;
+  if ((c.situacao || "Operando") !== "Operando") est = "off";
+  else if (!ult) est = "none";
+  else if (falta < 0) est = "bad";
+  else if (falta <= ALERTA_DIAS) est = "warn";
+  else est = "ok";
+  const pct = ult ? Math.min(100, Math.max(0, (periodo - falta)/periodo*100)) : 0;
+  return {...c, periodo, ult, prox, falta, futura, est, pct};
+}
+
+/* Limpezas por mês: realizadas (histórico) e previstas (projeção pela periodicidade) */
+function serieMensal(lista){
+  const H = hoje(), atual = chaveMes(H);
+  const meses = [];
+  for (let k = atual - MESES_ATRAS; k <= atual + MESES_FRENTE; k++) meses.push({k, real:0, prev:0});
+  const idx = k => meses.find(m => m.k === k);
+
+  (HIST.limpezas || []).forEach(l => { const d = parseData(l.data); const m = d && idx(chaveMes(d)); if (m && d <= H) m.real++; });
+
+  const fim = atual + MESES_FRENTE;
+  lista.filter(c => c.est !== "off").forEach(c => {
+    if (!c.prox){ const m = idx(atual); if (m) m.prev++; return; }        // sem registro: precisa ser feita já
+    let d = c.prox < H ? new Date(H) : new Date(c.prox);                   // vencida conta no mês atual
+    while (chaveMes(d) <= fim){
+      const m = idx(chaveMes(d)); if (m && chaveMes(d) >= atual) m.prev++;
+      d = new Date(d.getTime() + c.periodo*DIA);
+    }
+  });
+  return meses;
+}
+
+/* ================= Render ================= */
+function render(){
+  if (!DADOS) return;
+  const H = hoje();
+  const lista = LISTA = DADOS.cortinas.map(avaliar).sort((a,b) => a.tag.localeCompare(b.tag, "pt-BR", {numeric:true}));
+  const cont = {all: lista.length}; lista.forEach(c => cont[c.est] = (cont[c.est]||0) + 1);
+  const operando = lista.filter(c => c.est !== "off");
+  const emDia = operando.filter(c => c.est === "ok" || c.est === "warn").length;
+  const conf = operando.length ? Math.round(emDia/operando.length*100) : 0;
+
+  /* ---- widgets ---- */
+  $("w-conf").textContent = conf + "%";
+  $("w-conf").style.color = conf >= 90 ? "var(--ok)" : conf >= 70 ? "var(--warn)" : "var(--bad)";
+  $("w-conf-s").innerHTML = `<b>${emDia} de ${operando.length}</b> em operação com limpeza no prazo · meta 100%`;
+  sparkline();
+
+  const meses = serieMensal(lista);
+  const mAtual = meses.find(m => m.k === chaveMes(H));
+  const realMes = mAtual.real;
+  const prevMes = mAtual.prev;                         // ainda a fazer até o fim do mês
+  $("w-real-l").textContent = `Realizadas em ${MES_LONGO[H.getMonth()]}`;
+  $("w-real").innerHTML = `${realMes}<small> / ${realMes + prevMes}</small>`;
+  $("w-real-m").style.width = (realMes + prevMes ? realMes/(realMes+prevMes)*100 : 100) + "%";
+  $("w-real-s").innerHTML = prevMes ? `faltam <b>${prevMes}</b> até o fim do mês` : `nenhuma pendente este mês`;
+
+  const venc = lista.filter(c => c.est === "bad").sort((a,b) => a.falta - b.falta);
+  $("w-venc").textContent = venc.length;
+  $("wd-venc").classList.toggle("alert-bad", venc.length > 0);
+  $("w-venc-s").innerHTML = venc.length ? `maior atraso: <b>${venc[0].tag}</b> · ${plural(-venc[0].falta,"dia","dias")}` : `nenhuma limpeza atrasada`;
+
+  const off = lista.filter(c => c.est === "off");
+  $("w-off").innerHTML = `${off.length}<small> / ${lista.length}</small>`;
+  $("wd-off").classList.toggle("alert-off", off.length > 0);
+  $("w-off-s").innerHTML = off.length ? off.map(c => `<b>${esc(c.tag)}</b>`).join(" · ") : `todas operando`;
+
+  const prox = operando.filter(c => c.prox && c.falta >= 0).sort((a,b) => a.prox - b.prox)[0];
+  $("w-prox").textContent = prox ? ddmm(prox.prox) : "—";
+  $("w-prox-s").innerHTML = prox ? `<b>${esc(prox.tag)}</b> · ${prox.falta === 0 ? "hoje" : "em " + plural(prox.falta,"dia","dias")}` : "sem limpeza programada";
+
+  /* ---- filtros + cartões ---- */
+  $("chips").innerHTML = Object.entries(ESTADOS).map(([k,v]) =>
+    `<button class="chip ${v.c}" id="f-${k}" data-f="${k}" aria-pressed="${filtro===k}"><i></i>${v.l} <b>${cont[k]||0}</b></button>`).join("");
+  $("chips").querySelectorAll(".chip").forEach(b => b.onclick = () => { filtro = (filtro === b.dataset.f) ? "all" : b.dataset.f; render(); });
+
+  const vis = lista.filter(c => filtro === "all" || c.est === filtro);
+  $("mon-sub").textContent = `${plural(lista.length,"cortina","cortinas")} · periodicidade bimestral (60 dias)` + (filtro === "all" ? "" : ` · exibindo ${vis.length}`);
+  $("grid").innerHTML = vis.length ? vis.map(card).join("") : `<div class="empty">Nenhuma cortina em "${ESTADOS[filtro].l}".</div>`;
+
+  /* ---- agenda ---- */
+  const ag = operando.filter(c => c.prox && c.falta <= 30).sort((a,b) => a.falta - b.falta);
+  $("agenda").innerHTML = ag.length ? ag.map(c => `
+    <li class="${ESTADOS[c.est].c}">
+      <div class="day"><b>${ddmm(c.prox)}</b><span>${DSEM[c.prox.getDay()]}</span></div>
+      <div style="min-width:0"><div class="ag-t">${esc(c.tag)}</div><div class="ag-l" title="${esc(c.local)}">${esc(c.local)}</div></div>
+      <div class="ag-d">${c.falta < 0 ? `${-c.falta} d atraso` : c.falta === 0 ? "hoje" : `em ${c.falta} d`}</div>
+    </li>`).join("") : `<li class="ag-empty" style="display:block">Nenhuma limpeza nos próximos 30 dias.${prox ? `<br>Próxima: <b>${esc(prox.tag)}</b> em ${fmt(prox.prox)}.` : ""}</li>`;
+
+  const semReg = lista.filter(c => c.est === "none");
+  $("pend").innerHTML = (off.length || semReg.length) ? `<h3 class="sub">Pendências · ${off.length + semReg.length}</h3><ul class="pend">${
+    [...off, ...semReg].map(c => `<li class="${ESTADOS[c.est].c}"><span class="tag-s">${esc(c.tag)}</span><span class="pl">${esc(c.local)}<small>${c.est === "none" ? "Sem registro de limpeza" : esc(c.situacao)}${c.observacoes ? " · " + esc(c.observacoes) : ""}</small></span></li>`).join("")}</ul>` : "";
+
+  const ult = [...(HIST.limpezas || [])].filter(l => parseData(l.data) <= H).sort((a,b) => b.data.localeCompare(a.data) || a.tag.localeCompare(b.tag)).slice(0,5);
+  $("ultimas").innerHTML = ult.length ? `<h3 class="sub">Últimas limpezas registradas</h3><ul class="pend reg">${
+    ult.map(l => `<li class="c-ok"><span class="tag-s">${esc(l.tag)}</span><span class="pl">${esc(l.local)}</span><span class="when">${fmtC(parseData(l.data))}</span></li>`).join("")}</ul>` : "";
+
+  if (DADOS.board_url) $("board-link").href = DADOS.board_url;
+
+  desenharGrafico(meses);
+  renderTicker(lista, operando, emDia, conf, realMes, prevMes);
+  renderSync();
+}
+
+function card(c){
+  const cls = ESTADOS[c.est].c;
+  const pill = c.est === "off" ? esc(c.situacao.replace(/^Em /i, "")) : ROTULO[c.est];
+  let foot;
+  if (c.est === "off") foot = `<span class="obs">${esc(c.observacoes) || "Sem limpeza programada"}</span>`;
+  else if (c.est === "none") foot = `<span>Registrar 1ª limpeza no Monday</span>`;
+  else foot = `<span>Ciclo ${Math.round(c.pct)}%</span><span>${c.falta < 0 ? `<b>${-c.falta} d</b> atraso` : c.falta === 0 ? `<b>hoje</b>` : `faltam <b>${c.falta} d</b>`}</span>`;
+  return `<article class="card ${cls}">
+    <div class="card-h"><span class="tag">${esc(c.tag)}</span><span class="pill">${pill}</span></div>
+    <div class="loc">${esc(c.local)}</div>
+    <dl class="dates"><div><dt>Última</dt><dd>${fmtC(c.ult)}</dd></div><div><dt>Próxima</dt><dd>${fmtC(c.prox)}</dd></div></dl>
+    <div class="bar"><i style="width:${c.pct}%"></i></div>
+    <div class="foot">${foot}</div>
+  </article>`;
+}
+
+/* ================= Gráficos ================= */
+function sparkline(){
+  const svg = $("spark");
+  const fotos = (HIST.fotos || []).filter(f => f.conformidade != null).slice(-30);
+  const W = 200, Ht = 46;
+  svg.setAttribute("viewBox", `0 0 ${W} ${Ht}`);
+  if (fotos.length < 2){
+    svg.innerHTML = `<text x="${W}" y="${Ht/2+4}" text-anchor="end" style="font:12px var(--f-body);fill:var(--muted)">histórico a partir de hoje</text>`;
+    return;
+  }
+  const x = i => i/(fotos.length-1)*(W-6)+3, y = v => Ht-4 - (v/100)*(Ht-8);
+  const pts = fotos.map((f,i) => `${x(i).toFixed(1)},${y(f.conformidade).toFixed(1)}`);
+  const ult = fotos[fotos.length-1];
+  svg.innerHTML = `
+    <line x1="0" x2="${W}" y1="${y(100)}" y2="${y(100)}" stroke="#d9e3db" stroke-dasharray="3 3"/>
+    <path d="M${pts[0]} L${pts.join(" L")} L${x(fotos.length-1)},${Ht} L${x(0)},${Ht} Z" fill="rgba(46,111,217,.10)"/>
+    <polyline points="${pts.join(" ")}" fill="none" stroke="#2e6fd9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="${x(fotos.length-1)}" cy="${y(ult.conformidade)}" r="3.5" fill="#2e6fd9" stroke="#fff" stroke-width="2"/>`;
+}
+
+function desenharGrafico(meses){
+  const box = $("chart"), svg = $("chart-svg");
+  const W = box.clientWidth, Ht = box.clientHeight;
+  if (!W || !Ht) return;
+  const atual = chaveMes(hoje());
+  const padL = 8, padR = 8, padT = 22, padB = 26;
+  const max = Math.max(4, ...meses.map(m => m.real + m.prev));
+  const passo = (W - padL - padR) / meses.length;
+  const bw = Math.min(46, passo*0.62);
+  const y = v => padT + (Ht - padT - padB) * (1 - v/max);
+  const base = y(0);
+  let g = "";
+  // grade
+  [0.5, 1].forEach(f => { const v = Math.round(max*f); g += `<line x1="${padL}" x2="${W-padR}" y1="${y(v)}" y2="${y(v)}" stroke="#e8eee9"/>`; });
+  g += `<line x1="${padL}" x2="${W-padR}" y1="${base}" y2="${base}" stroke="#c9d6cc"/>`;
+  meses.forEach((m,i) => {
+    const cx = padL + passo*i + passo/2, x0 = cx - bw/2;
+    const tot = m.real + m.prev;
+    const yr = y(m.real), yt = y(tot);
+    if (m.real) g += barra(x0, yr, bw, base - yr, "#2e6fd9", !m.prev);
+    if (m.prev) g += barra(x0, yt, bw, (m.real ? yr - 2 : base) - yt, "#a9c4f0", true);
+    if (tot) g += `<text class="val" x="${cx}" y="${yt - 6}" text-anchor="middle">${tot}</text>`;
+    const ano = (m.k % 12 === 0 || i === 0) ? `/${String(Math.floor(m.k/12)).slice(2)}` : "";
+    g += `<text class="${m.k === atual ? "cur" : ""}" x="${cx}" y="${Ht - 8}" text-anchor="middle">${MES[m.k % 12]}${ano}</text>`;
+    g += `<rect x="${padL + passo*i}" y="${padT}" width="${passo}" height="${base - padT}" fill="transparent" data-i="${i}" class="hit"/>`;
+  });
+  // marcador do mês atual
+  const ia = meses.findIndex(m => m.k === atual);
+  if (ia >= 0){ const xm = padL + passo*ia; g = `<rect x="${xm}" y="${padT-16}" width="${passo}" height="${base-padT+16}" fill="rgba(15,122,61,.06)" rx="6"/>` + g; }
+  svg.setAttribute("viewBox", `0 0 ${W} ${Ht}`);
+  svg.innerHTML = g;
+
+  const tip = $("tip");
+  svg.querySelectorAll(".hit").forEach(r => {
+    r.onmouseenter = () => {
+      const m = meses[+r.dataset.i], cx = padL + passo*(+r.dataset.i) + passo/2;
+      const nome = `${MES_LONGO[m.k % 12]} ${Math.floor(m.k/12)}`;
+      tip.innerHTML = `<b>${nome}</b><br>Realizadas: <b>${m.real}</b>${m.k >= atual ? `<br>Previstas: <b>${m.prev}</b>` : ""}`;
+      tip.style.left = cx + "px"; tip.style.top = y(m.real + m.prev) + "px"; tip.hidden = false;
+    };
+    r.onmouseleave = () => tip.hidden = true;
+  });
+}
+function barra(x, y, w, h, cor, topoRedondo){
+  if (h <= 0) return "";
+  const r = Math.min(4, h/2, w/2);
+  if (!topoRedondo) return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${cor}"/>`;
+  return `<path d="M${x},${y+h} V${y+r} Q${x},${y} ${x+r},${y} H${x+w-r} Q${x+w},${y} ${x+w},${y+r} V${y+h} Z" fill="${cor}"/>`;
+}
+
+/* ================= Letreiro ================= */
+function renderTicker(lista, operando, emDia, conf, realMes, prevMes){
+  const m = [];
+  const add = (cls, tag, html) => m.push(`<span class="msg ${cls}">${tag ? `<span class="tg">${esc(tag)}</span>` : ""}${html}</span>`);
+  const H = hoje();
+
+  if (erroCarga) add("m-bad", "ERRO", `Não foi possível ler os dados do Monday — mostrando a última versão carregada`);
+  if (horasDesdeSync() > DADOS_VELHOS_H) add("m-warn", "DADOS", `Última sincronização com o Monday há <b>${Math.floor(horasDesdeSync())} h</b> — conferir a automação do GitHub`);
+
+  lista.filter(c => c.est === "bad").sort((a,b) => a.falta - b.falta)
+    .forEach(c => add("m-bad", c.tag, `${esc(c.local)} — limpeza <b>vencida há ${plural(-c.falta,"dia","dias")}</b>`));
+  lista.filter(c => c.est === "warn").sort((a,b) => a.falta - b.falta)
+    .forEach(c => add("m-warn", c.tag, `${esc(c.local)} — limpeza ${c.falta === 0 ? "<b>vence hoje</b>" : `em <b>${plural(c.falta,"dia","dias")}</b> (${ddmm(c.prox)})`}`));
+  lista.filter(c => c.est === "none")
+    .forEach(c => add("m-info", c.tag, `${esc(c.local)} — <b>sem registro</b> de limpeza no Monday`));
+  const fut = lista.filter(c => c.futura && c.est !== "off");
+  if (fut.length > 3) add("m-info", "CONFERIR", `<b>${fut.length} cortinas</b> com data da última limpeza no futuro (${fut.map(c => esc(c.tag)).join(", ")}) — conferir no Monday`);
+  else fut.forEach(c => add("m-info", c.tag, `Data da última limpeza está no futuro (<b>${fmt(c.ult)}</b>) — conferir no Monday`));
+  lista.filter(c => c.est === "off")
+    .forEach(c => add("m-off", c.tag, `${esc(c.local)} — <b>${esc(c.situacao)}</b>${c.observacoes ? ` · ${esc(c.observacoes)}` : ""}`));
+
+  add("m-ok", "", `Conformidade de limpeza: <b>${conf}%</b> (${emDia} de ${operando.length} cortinas em operação no prazo)`);
+  add("m-ok", "", `${MES_LONGO[H.getMonth()][0].toUpperCase() + MES_LONGO[H.getMonth()].slice(1)}: <b>${realMes}</b> limpezas realizadas · <b>${prevMes}</b> previstas até o fim do mês`);
+  const prox = operando.filter(c => c.prox && c.falta >= 0).sort((a,b) => a.prox - b.prox)[0];
+  if (prox) add("m-ok", "", `Próxima limpeza: <b>${esc(prox.tag)}</b> · ${esc(prox.local)} em <b>${fmt(prox.prox)}</b>`);
+  add("m-info", "", `Periodicidade: <b>bimestral (60 dias)</b> · registre cada limpeza na coluna "Última Limpeza" do Monday`);
+
+  const html = m.join("");
+  const track = $("ticker");
+  if (track.dataset.html === html) return;
+  track.dataset.html = html;
+  track.innerHTML = html + html;
+  const reduzido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  requestAnimationFrame(() => {
+    const larg = track.scrollWidth / 2;
+    track.style.animation = reduzido ? "none" : `rolar ${Math.max(25, larg/70)}s linear infinite`;
+  });
+}
+
+/* ================= Sincronização / relógio ================= */
+const horasDesdeSync = () => DADOS?.gerado_em ? (Date.now() - new Date(DADOS.gerado_em).getTime())/36e5 : 0;
+function fmtSync(){
+  if (!DADOS?.gerado_em) return "—";
+  const d = new Date(DADOS.gerado_em);
+  return `${ddmm(d)} ${d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}`;
+}
+function renderSync(){
+  $("sync").className = "sync" + (erroCarga ? " err" : horasDesdeSync() > DADOS_VELHOS_H ? " stale" : "");
+  $("sync-t").textContent = erroCarga ? "Monday · erro de leitura" : `Monday · atualizado ${fmtSync()}`;
+}
+function relogio(){
+  const d = new Date();
+  $("clk-h").textContent = d.toLocaleTimeString("pt-BR");
+  $("clk-d").textContent = d.toLocaleDateString("pt-BR",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"});
+}
+
+async function carregar(){
+  try{
+    const r = await fetch(`${DATA_URL}?t=${Date.now()}`, {cache:"no-store"});
+    if (!r.ok) throw new Error(r.status);
+    DADOS = await r.json(); erroCarga = false;
+  }catch(e){
+    erroCarga = true;
+    if (!DADOS){ $("grid").innerHTML = `<div class="empty">Não foi possível carregar <b>data/latest.json</b>. Rode a automação "Atualizar dados do Monday" no GitHub (aba Actions).</div>`; renderSync(); return; }
+  }
+  try{
+    const r = await fetch(`${HIST_URL}?t=${Date.now()}`, {cache:"no-store"});
+    if (r.ok) HIST = await r.json();
+  }catch(e){ /* sem histórico ainda: gráficos mostram só a projeção */ }
+  render();
+}
+
+/* ================= Janelas (minimizar / maximizar / fechar) ================= */
+const ICON = {
+  min:'<svg viewBox="0 0 12 12"><path d="M2 9h8"/></svg>',
+  max:'<svg viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" rx="1"/></svg>',
+  x:  '<svg viewBox="0 0 12 12"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg>',
+};
+function montarJanelas(){
+  document.querySelectorAll(".wctl").forEach(ctl => {
+    const id = ctl.dataset.win;
+    ctl.innerHTML = `<button aria-label="Minimizar" data-a="min">${ICON.min}</button><button aria-label="Maximizar" data-a="max">${ICON.max}</button><button class="x" aria-label="Fechar" data-a="min">${ICON.x}</button>`;
+    ctl.querySelectorAll("button").forEach(b => b.onclick = () => b.dataset.a === "max" ? maximizar(id) : alternar(id, false));
+  });
+  $("apps").innerHTML = JANELAS.map(j => `<button class="app on" id="app-${j.id}" data-w="${j.id}">${j.nome}</button>`).join("");
+  $("apps").querySelectorAll(".app").forEach(b => b.onclick = () => alternar(b.dataset.w));
+}
+function alternar(id, mostrar){
+  const w = $(id); const vis = mostrar ?? w.hidden;
+  if (!vis && w.classList.contains("max")) maximizar(id);
+  w.hidden = !vis; $("app-"+id).classList.toggle("on", vis);
+  redesenhar();
+}
+function maximizar(id){
+  const w = $(id), ja = w.classList.contains("max");
+  document.querySelectorAll(".win.max").forEach(x => x.classList.remove("max"));
+  if (!ja){ w.classList.add("max"); w.hidden = false; $("app-"+id).classList.add("on"); }
+  $("desktop").classList.toggle("has-max", !ja);
+  redesenhar();
+}
+const redesenhar = () => requestAnimationFrame(() => LISTA.length && desenharGrafico(serieMensal(LISTA)));
+
+/* ================= Início ================= */
+montarJanelas();
+relogio(); setInterval(relogio, 1000);
+carregar(); setInterval(carregar, RECARREGAR_MIN*60*1000);
+setInterval(render, 60*1000);
+new ResizeObserver(redesenhar).observe($("chart"));
+</script>
+</body>
+</html>

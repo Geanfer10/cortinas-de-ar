@@ -1,0 +1,101 @@
+{
+  "limpezas": [
+    {
+      "tag": "CA-01",
+      "local": "Sala de Assepsia Principal",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-02",
+      "local": "Sala de Assepsia Principal",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-03",
+      "local": "Sala de Assepsia Secundária (Laboratório)",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-04",
+      "local": "Sala de Pesagem / Armazenamento de Insumos",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-05",
+      "local": "Sala de Assepsia Envase Asséptico",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-06",
+      "local": "Sala de Assepsia Seleção de Tomate",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-07",
+      "local": "Sala de Preparo de Salmoura",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-08",
+      "local": "Sala de Assepsia Despalhadeiras",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-09",
+      "local": "Sala de Assepsia Desgranadeiras",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-10",
+      "local": "Desenvase – Entrada",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-11",
+      "local": "Desenvase – Esteira 1",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-12",
+      "local": "Desenvase – Esteira 2",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-13",
+      "local": "Desenvase – Esteira 3",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-14",
+      "local": "Sala de Assepsia de Ervilha",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-15T14:59:08-03:00"
+    }
+  ],
+  "fotos": [
+    {
+      "data": "2026-10-15",
+      "total": 14,
+      "operando": 11,
+      "em_dia": 11,
+      "a_vencer": 0,
+      "vencida": 0,
+      "sem_registro": 0,
+      "fora": 3,
+      "conformidade": 100.0
+    }
+  ]
+}
