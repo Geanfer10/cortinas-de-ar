@@ -25,7 +25,8 @@ COL = {
     "periodicidade": "numeric_mm857ejg",
     "ultima": "date_mm856a3h",
     "proxima": "formula_mm856pk3",
-    "responsavel": "multiple_person_mm85dc1b",
+    "responsavel": "text_mm85w8hs",
+    "os": "text_mm85vyeq",
     "observacoes": "long_text_mm85myen",
 }
 
@@ -123,6 +124,7 @@ def main():
             "ultima_limpeza": ultima.isoformat() if ultima else None,
             "proxima_limpeza": proxima.isoformat() if proxima else None,
             "responsavel": txt("responsavel"),
+            "os": txt("os"),
             "observacoes": txt("observacoes"),
         })
 
