@@ -83,6 +83,30 @@
       "local": "Sala de Assepsia de Ervilha",
       "data": "2026-10-16",
       "registrado_em": "2026-10-15T14:59:08-03:00"
+    },
+    {
+      "tag": "CA-15",
+      "local": "Esteira de Tambores de Polpa 01",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-16T15:24:55-03:00"
+    },
+    {
+      "tag": "CA-16",
+      "local": "Esteira de Tambores de Polpa 02",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-16T15:24:55-03:00"
+    },
+    {
+      "tag": "CA-17",
+      "local": "Esteira de Tambores de Polpa 03",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-16T15:24:55-03:00"
+    },
+    {
+      "tag": "CA-18",
+      "local": "Esteira de Tambores de Polpa 04",
+      "data": "2026-10-16",
+      "registrado_em": "2026-10-16T15:24:55-03:00"
     }
   ],
   "fotos": [
@@ -100,13 +124,13 @@
     {
       "data": "2026-10-16",
       "total": 18,
-      "operando": 14,
-      "em_dia": 10,
+      "operando": 11,
+      "em_dia": 11,
       "a_vencer": 0,
       "vencida": 0,
-      "sem_registro": 4,
-      "fora": 4,
-      "conformidade": 71.4
+      "sem_registro": 0,
+      "fora": 7,
+      "conformidade": 100.0
     }
   ],
   "registro_fotos": []
