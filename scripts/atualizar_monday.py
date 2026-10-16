@@ -3,7 +3,10 @@ Busca o quadro "Cortinas de Ar – Limpeza" no Monday e grava:
   - data/latest.json    -> situação atual de cada cortina
   - data/historico.json -> registro das limpezas detectadas + foto diária da conformidade
                            (alimenta os gráficos executivos do painel)
-  - data/fotos/         -> fotos de Antes e Depois anexadas no Monday (cópia reduzida em JPG)
+  - data/fotos/         -> fotos de Antes e Depois anexadas no Monday (cópia reduzida em JPG).
+                           As fotos ficam fixas: nunca são apagadas daqui. Se a célula do Monday
+                           for limpa, o painel continua mostrando a última foto; quando uma foto
+                           nova é anexada, ela passa a ser a exibida e a anterior fica no histórico.
 Roda no GitHub Actions. O token vem do secret MONDAY_API_TOKEN (nunca é impresso no log).
 Pillow (+ pillow-heif para fotos de iPhone) é opcional: se estiver instalado, as fotos são
 reduzidas para JPG de até 1600 px; sem ele, o arquivo é salvo como veio.
@@ -93,7 +96,7 @@ def para_data(txt):
         return None
 
 
-def baixar_foto(coluna, tag, lado, usadas):
+def baixar_foto(coluna, tag, lado):
     """Salva a foto mais recente da coluna em data/fotos e devolve {arquivo, nome, enviada_em}."""
     arquivos = [f for f in (coluna or {}).get("files") or [] if f and f.get("asset")]
     arquivos = [f for f in arquivos if (f["asset"].get("file_extension") or "").lower().lstrip(".") in EXT_IMG]
@@ -102,7 +105,6 @@ def baixar_foto(coluna, tag, lado, usadas):
     f = max(arquivos, key=lambda x: x.get("created_at") or "")
     destino = PASTA_IMG / f"{tag}_{lado}_{f['asset_id']}.jpg"
     rel = f"data/fotos/{destino.name}"
-    usadas.add(destino.name)
     info = {"arquivo": rel, "nome": f.get("name") or "", "enviada_em": (f.get("created_at") or "")[:19]}
     if destino.exists():
         return info
@@ -146,8 +148,24 @@ def main():
         if not cursor:
             break
 
+    # fotos atuais (para manter a última quando a célula do Monday estiver vazia)
+    anteriores = {}
+    if SAIDA.exists():
+        try:
+            anteriores = {c["tag"]: c for c in json.loads(SAIDA.read_text(encoding="utf-8")).get("cortinas", [])}
+        except ValueError:
+            pass
+
+    def foto(coluna, tag, lado):
+        nova = baixar_foto(coluna, tag, lado)
+        if nova:
+            return nova
+        velha = (anteriores.get(tag) or {}).get(f"foto_{lado}")
+        if velha and (PASTA.parent / velha["arquivo"]).exists():
+            return velha
+        return None
+
     cortinas = []
-    fotos_usadas = set()
     for it in itens:
         v = {c["id"]: c for c in it["column_values"]}
         txt = lambda chave: (v.get(COL[chave], {}).get("text") or "").strip()
@@ -174,15 +192,9 @@ def main():
             "responsavel": txt("responsavel"),
             "os": txt("os"),
             "observacoes": txt("observacoes"),
-            "foto_antes": baixar_foto(v.get(COL["foto_antes"]), it["name"].strip(), "antes", fotos_usadas),
-            "foto_depois": baixar_foto(v.get(COL["foto_depois"]), it["name"].strip(), "depois", fotos_usadas),
+            "foto_antes": foto(v.get(COL["foto_antes"]), it["name"].strip(), "antes"),
+            "foto_depois": foto(v.get(COL["foto_depois"]), it["name"].strip(), "depois"),
         })
-
-    # apaga do repositório as fotos que foram trocadas ou removidas no Monday
-    if PASTA_IMG.exists():
-        for arq in PASTA_IMG.iterdir():
-            if arq.is_file() and arq.name not in fotos_usadas and arq.name != ".gitkeep":
-                arq.unlink()
 
     cortinas.sort(key=lambda c: c["tag"])
 
@@ -235,6 +247,19 @@ def atualizar_historico(cortinas):
                 "registrado_em": agora.isoformat(timespec="seconds"),
             })
     hist["limpezas"].sort(key=lambda l: (l["data"], l["tag"]))
+
+    # 1b) cada foto nova de antes/depois fica registrada (nada é apagado)
+    hist.setdefault("registro_fotos", [])
+    ja_fotos = {r["arquivo"] for r in hist["registro_fotos"]}
+    for c in cortinas:
+        for lado in ("antes", "depois"):
+            f = c.get(f"foto_{lado}")
+            if f and f["arquivo"] not in ja_fotos:
+                hist["registro_fotos"].append({
+                    "tag": c["tag"], "lado": lado, "arquivo": f["arquivo"],
+                    "enviada_em": f.get("enviada_em", ""), "ultima_limpeza": c["ultima_limpeza"],
+                })
+    hist["registro_fotos"].sort(key=lambda r: (r["enviada_em"], r["tag"], r["lado"]))
 
     # 2) uma foto por dia da conformidade (a do dia é sobrescrita a cada execução)
     cont = {"em_dia": 0, "a_vencer": 0, "vencida": 0, "sem_registro": 0, "fora": 0}
