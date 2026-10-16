@@ -13,7 +13,7 @@
 :root{
   --desk:#e9efea; --win:#ffffff; --win-2:#f5f8f5; --titlebar:#f7faf7; --line:#d9e3db; --line-2:#e8eee9;
   --ink:#14241a; --muted:#5f7065; --brand:#0f7a3d; --brand-2:#0b5e2f;
-  --ok:#1e9350; --warn:#c77a0c; --bad:#cf3a33; --off:#6b7480; --none:#2e6fd9;
+  --ok:#1e9350; --warn:#c77a0c; --bad:#cf3a33; --off:#6b7480; --none:#2e6fd9; --man:#e8740c; --ni:#d6322b;
   --serie:#2e6fd9; --serie-plan:#a9c4f0;
   --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -42,19 +42,19 @@ button{font:inherit;color:inherit}
 .msg::after{content:"";width:6px;height:6px;transform:rotate(45deg);background:rgba(255,255,255,.35);margin-left:22px}
 .msg b{font-family:var(--f-num);font-weight:700}
 .tg{font-family:var(--f-num);font-size:12px;font-weight:700;padding:2px 7px;border-radius:4px;background:#fff;color:var(--c,var(--brand-2))}
-.m-bad{--c:var(--bad)} .m-warn{--c:var(--warn)} .m-off{--c:var(--off)} .m-ok{--c:var(--ok)} .m-info{--c:var(--none)}
-.m-bad .tg{background:#ffd9d6} .m-warn .tg{background:#ffe6bf} .m-info .tg{background:#dbe7fb} .m-off .tg{background:#e6e9ec}
+.m-bad{--c:var(--bad)} .m-warn{--c:var(--warn)} .m-off{--c:var(--off)} .m-man{--c:var(--man)} .m-ni{--c:var(--ni)} .m-ok{--c:var(--ok)} .m-info{--c:var(--none)}
+.m-bad .tg{background:#ffd9d6} .m-warn .tg{background:#ffe6bf} .m-info .tg{background:#dbe7fb} .m-off .tg{background:#e6e9ec} .m-man .tg{background:#ffe2c7} .m-ni .tg{background:#ffd6d3}
 @keyframes rolar{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes pulsar{70%{box-shadow:0 0 0 8px rgba(255,211,107,0)}100%{box-shadow:0 0 0 0 rgba(255,211,107,0)}}
 @media (prefers-reduced-motion:no-preference){.pulse{animation:pulsar 1.8s infinite}}
 
 /* ===== widgets executivos ===== */
-.widgets{display:grid;grid-template-columns:1.5fr repeat(4,minmax(0,1fr));gap:14px;padding-block:14px 0;
+.widgets{display:grid;grid-template-columns:1.35fr repeat(6,minmax(0,1fr));gap:14px;padding-block:14px 0;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wd{background:var(--win);border:1px solid var(--line);border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;gap:4px;min-width:0;
   box-shadow:0 6px 18px rgba(20,36,26,.06)}
 .wd-l{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.wd-v{font-family:var(--f-num);font-weight:700;font-size:34px;line-height:1.05;font-variant-numeric:tabular-nums}
+.wd-v{font-family:var(--f-num);font-weight:700;font-size:32px;line-height:1.05;font-variant-numeric:tabular-nums}
 .wd-v small{font-size:16px;color:var(--muted);font-weight:500}
 .wd-s{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wd-s b{color:var(--ink);font-family:var(--f-num)}
@@ -65,7 +65,15 @@ button{font:inherit;color:inherit}
 .meter i{display:block;height:100%;border-radius:3px;background:var(--serie)}
 button.wd{font:inherit;color:inherit;text-align:left;cursor:pointer;transition:border-color .15s,box-shadow .15s}
 button.wd:hover{border-color:var(--brand);box-shadow:0 8px 22px rgba(15,122,61,.14)}
-.wd.alert-bad .wd-v{color:var(--bad)} .wd.alert-off .wd-v{color:var(--off)}
+.wd.alert-bad .wd-v{color:var(--bad)}
+.wd.sit{border-top:4px solid var(--c)}
+.wd.sit .wd-v{color:var(--c)}
+.wd.sit.on{background:color-mix(in srgb,var(--c) 12%,#fff);border-color:var(--c);box-shadow:0 8px 22px color-mix(in srgb,var(--c) 22%,transparent)}
+.wd.sit.on .wd-l{color:var(--c)}
+.wd.s-op{--c:var(--ok)} .wd.s-man{--c:var(--man)} .wd.s-ni{--c:var(--ni)}
+.wd.s-op.on{background:var(--win);box-shadow:0 6px 18px rgba(20,36,26,.06);border-color:var(--line);border-top-color:var(--c)}
+@keyframes alerta{50%{box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 30%,transparent)}}
+@media (prefers-reduced-motion:no-preference){.wd.s-man.on,.wd.s-ni.on{animation:alerta 2.4s ease-in-out infinite}}
 
 /* ===== área de trabalho ===== */
 .desktop{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 400px;grid-template-rows:auto minmax(0,1fr);gap:14px;
@@ -89,7 +97,7 @@ button.wd:hover{border-color:var(--brand);box-shadow:0 8px 22px rgba(15,122,61,.
 .chip b{font-family:var(--f-num);color:var(--ink)}
 .chip:hover{border-color:var(--c)}
 .chip[aria-pressed="true"]{background:color-mix(in srgb,var(--c) 12%,#fff);border-color:var(--c);color:var(--ink)}
-.c-all{--c:var(--brand)} .c-ok{--c:var(--ok)} .c-warn{--c:var(--warn)} .c-bad{--c:var(--bad)} .c-none{--c:var(--none)} .c-off{--c:var(--off)}
+.c-all{--c:var(--brand)} .c-ok{--c:var(--ok)} .c-warn{--c:var(--warn)} .c-bad{--c:var(--bad)} .c-none{--c:var(--none)} .c-off{--c:var(--off)} .c-man{--c:var(--man)} .c-ni{--c:var(--ni)}
 
 /* cartões */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
@@ -98,7 +106,7 @@ button.wd:hover{border-color:var(--brand);box-shadow:0 8px 22px rgba(15,122,61,.
 .card::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--c)}
 .card-h{display:flex;justify-content:space-between;align-items:center;gap:6px}
 .tag{font-family:var(--f-num);font-weight:700;font-size:19px;white-space:nowrap;flex:none}
-.pill{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:999px;color:var(--c);background:color-mix(in srgb,var(--c) 12%,#fff);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.pill{font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:3px 7px;border-radius:999px;color:var(--c);background:color-mix(in srgb,var(--c) 12%,#fff);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .loc{font-size:13.5px;color:var(--muted);line-height:1.25;min-height:2.5em}
 .dates{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0;border-top:1px solid var(--line-2);padding-top:7px}
 .dates dt{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
@@ -108,7 +116,9 @@ button.wd:hover{border-color:var(--brand);box-shadow:0 8px 22px rgba(15,122,61,.
 .foot{display:flex;justify-content:space-between;gap:6px;font-size:12px;color:var(--muted)}
 .foot b{font-family:var(--f-num);color:var(--c)}
 .obs{font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card.c-off{background:var(--win-2)}
+.card.c-man{background:color-mix(in srgb,var(--man) 7%,#fff);border-color:color-mix(in srgb,var(--man) 45%,#fff)}
+.card.c-ni{background:color-mix(in srgb,var(--ni) 6%,#fff);border-color:color-mix(in srgb,var(--ni) 40%,#fff)}
+.card.c-man .obs,.card.c-ni .obs{color:var(--c)}
 .empty{grid-column:1/-1;padding:26px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:8px}
 
 /* planejamento (gráfico) */
@@ -261,10 +271,20 @@ table.det{width:100%;border-collapse:collapse;font-size:14px}
       <span class="wd-v" id="w-venc">—</span>
       <span class="wd-s" id="w-venc-s">—</span>
     </button>
-    <button class="wd" id="wd-off" data-k="off">
-      <span class="wd-l">Fora de operação</span>
-      <span class="wd-v" id="w-off">—</span>
-      <span class="wd-s" id="w-off-s">—</span>
+    <button class="wd sit s-op" id="wd-op" data-k="op">
+      <span class="wd-l">Operando</span>
+      <span class="wd-v" id="w-op">—</span>
+      <span class="wd-s" id="w-op-s">—</span>
+    </button>
+    <button class="wd sit s-man" id="wd-man" data-k="man">
+      <span class="wd-l">Em manutenção</span>
+      <span class="wd-v" id="w-man">—</span>
+      <span class="wd-s" id="w-man-s">—</span>
+    </button>
+    <button class="wd sit s-ni" id="wd-ni" data-k="ni">
+      <span class="wd-l">Não instalada</span>
+      <span class="wd-v" id="w-ni">—</span>
+      <span class="wd-s" id="w-ni-s">—</span>
     </button>
     <button class="wd" data-k="prox">
       <span class="wd-l">Próxima limpeza</span>
@@ -369,7 +389,8 @@ const ESTADOS = {
   warn:{l:"A vencer",         c:"c-warn"},
   ok:  {l:"Em dia",           c:"c-ok"},
   none:{l:"Sem registro",     c:"c-none"},
-  off: {l:"Fora de operação", c:"c-off"},
+  man: {l:"Em manutenção",    c:"c-man"},
+  ni:  {l:"Não instalada",    c:"c-ni"},
 };
 const ROTULO = {ok:"Em dia", warn:"A vencer", bad:"Vencida", none:"Sem registro"};
 
@@ -390,8 +411,13 @@ function avaliar(c){
   else if (falta <= ALERTA_DIAS) est = "warn";
   else est = "ok";
   const pct = ult ? Math.min(100, Math.max(0, (periodo - falta)/periodo*100)) : 0;
-  return {...c, periodo, ult, prox, falta, futura, est, pct};
+  const st = (c.situacao || "Operando").toLowerCase();
+  const sitc = st === "operando" ? "op" : st.includes("instal") ? "ni" : "man";   // situação do Monday
+  return {...c, periodo, ult, prox, falta, futura, est, pct, sitc};
 }
+
+const clsDe = c => c.est === "off" ? (c.sitc === "ni" ? "c-ni" : "c-man") : ESTADOS[c.est].c;
+const casa = (c, f) => f === "all" || ((f === "man" || f === "ni") ? c.est === "off" && c.sitc === f : c.est === f);
 
 /* Limpezas por mês: realizadas (histórico) e previstas (projeção pela periodicidade) */
 function serieMensal(lista){
@@ -419,7 +445,7 @@ function render(){
   if (!DADOS) return;
   const H = hoje();
   const lista = LISTA = DADOS.cortinas.map(avaliar).sort((a,b) => a.tag.localeCompare(b.tag, "pt-BR", {numeric:true}));
-  const cont = {all: lista.length}; lista.forEach(c => cont[c.est] = (cont[c.est]||0) + 1);
+  const cont = {all: lista.length}; lista.forEach(c => { cont[c.est] = (cont[c.est]||0) + 1; if (c.est === "off") cont[c.sitc] = (cont[c.sitc]||0) + 1; });
   const operando = lista.filter(c => c.est !== "off");
   const emDia = operando.filter(c => c.est === "ok" || c.est === "warn").length;
   const conf = operando.length ? Math.round(emDia/operando.length*100) : 0;
@@ -427,7 +453,7 @@ function render(){
   /* ---- widgets ---- */
   $("w-conf").textContent = conf + "%";
   $("w-conf").style.color = conf >= 90 ? "var(--ok)" : conf >= 70 ? "var(--warn)" : "var(--bad)";
-  $("w-conf-s").innerHTML = `<b>${emDia} de ${operando.length}</b> em operação com limpeza no prazo · meta 100%`;
+  $("w-conf-s").innerHTML = `<b>${emDia} de ${operando.length}</b> no prazo · meta 100%`;
   sparkline();
 
   const meses = serieMensal(lista);
@@ -445,9 +471,18 @@ function render(){
   $("w-venc-s").innerHTML = venc.length ? `maior atraso: <b>${venc[0].tag}</b> · ${plural(-venc[0].falta,"dia","dias")}` : `nenhuma limpeza atrasada`;
 
   const off = lista.filter(c => c.est === "off");
-  $("w-off").innerHTML = `${off.length}<small> / ${lista.length}</small>`;
-  $("wd-off").classList.toggle("alert-off", off.length > 0);
-  $("w-off-s").innerHTML = off.length ? off.map(c => `<b>${esc(c.tag)}</b>`).join(" · ") : `todas operando`;
+  const sitW = (id, arr, vazio) => {
+    $("w-"+id).innerHTML = `${arr.length}<small> / ${lista.length}</small>`;
+    $("w-"+id+"-s").innerHTML = arr.length ? arr.map(c => `<b>${esc(c.tag)}</b>`).join(" · ") : vazio;
+  };
+  const man = off.filter(c => c.sitc === "man"), ni = off.filter(c => c.sitc === "ni");
+  sitW("op", operando, "nenhuma operando");
+  $("w-op-s").innerHTML = `<b>${Math.round(operando.length/lista.length*100)}%</b> das cortinas em operação`;
+  sitW("man", man, "nenhuma em manutenção");
+  sitW("ni", ni, "todas instaladas");
+  $("wd-op").classList.add("on");
+  $("wd-man").classList.toggle("on", man.length > 0);
+  $("wd-ni").classList.toggle("on", ni.length > 0);
 
   const prox = operando.filter(c => c.prox && c.falta >= 0).sort((a,b) => a.prox - b.prox)[0];
   $("w-prox").textContent = prox ? ddmm(prox.prox) : "—";
@@ -458,7 +493,7 @@ function render(){
     `<button class="chip ${v.c}" id="f-${k}" data-f="${k}" aria-pressed="${filtro===k}"><i></i>${v.l} <b>${cont[k]||0}</b></button>`).join("");
   $("chips").querySelectorAll(".chip").forEach(b => b.onclick = () => { filtro = (filtro === b.dataset.f) ? "all" : b.dataset.f; render(); });
 
-  const vis = lista.filter(c => filtro === "all" || c.est === filtro);
+  const vis = lista.filter(c => casa(c, filtro));
   $("mon-sub").textContent = `${plural(lista.length,"cortina","cortinas")} · periodicidade bimestral (60 dias)` + (filtro === "all" ? "" : ` · exibindo ${vis.length}`);
   $("grid").innerHTML = vis.length ? vis.map(card).join("") : `<div class="empty">Nenhuma cortina em "${ESTADOS[filtro].l}".</div>`;
   $("grid").querySelectorAll(".card").forEach(el => {
@@ -469,7 +504,7 @@ function render(){
   /* ---- agenda ---- */
   const ag = operando.filter(c => c.prox && c.falta <= 30).sort((a,b) => a.falta - b.falta);
   $("agenda").innerHTML = ag.length ? ag.map(c => `
-    <li class="${ESTADOS[c.est].c}">
+    <li class="${clsDe(c)}">
       <div class="day"><b>${ddmm(c.prox)}</b><span>${DSEM[c.prox.getDay()]}</span></div>
       <div style="min-width:0"><div class="ag-t">${esc(c.tag)}</div><div class="ag-l" title="${esc(c.local)}">${esc(c.local)}</div></div>
       <div class="ag-d">${c.falta < 0 ? `${-c.falta} d atraso` : c.falta === 0 ? "hoje" : `em ${c.falta} d`}</div>
@@ -477,7 +512,7 @@ function render(){
 
   const semReg = lista.filter(c => c.est === "none");
   $("pend").innerHTML = (off.length || semReg.length) ? `<h3 class="sub">Pendências · ${off.length + semReg.length}</h3><ul class="pend">${
-    [...off, ...semReg].map(c => `<li class="${ESTADOS[c.est].c}"><span class="tag-s">${esc(c.tag)}</span><span class="pl">${esc(c.local)}<small>${c.est === "none" ? "Sem registro de limpeza" : esc(c.situacao)}${c.os ? " · OS " + esc(c.os) : ""}${c.observacoes ? " · " + esc(c.observacoes) : ""}</small></span></li>`).join("")}</ul>` : "";
+    [...off, ...semReg].map(c => `<li class="${clsDe(c)}"><span class="tag-s">${esc(c.tag)}</span><span class="pl">${esc(c.local)}<small>${c.est === "none" ? "Sem registro de limpeza" : esc(c.situacao)}${c.os ? " · OS " + esc(c.os) : ""}${c.observacoes ? " · " + esc(c.observacoes) : ""}</small></span></li>`).join("")}</ul>` : "";
 
   const ult = [...(HIST.limpezas || [])].filter(l => parseData(l.data) <= H).sort((a,b) => b.data.localeCompare(a.data) || a.tag.localeCompare(b.tag)).slice(0,5);
   $("ultimas").innerHTML = ult.length ? `<h3 class="sub">Últimas limpezas registradas</h3><ul class="pend reg">${
@@ -493,8 +528,8 @@ function render(){
 }
 
 function card(c){
-  const cls = ESTADOS[c.est].c;
-  const pill = c.est === "off" ? esc(c.situacao.replace(/^Em /i, "")) : ROTULO[c.est];
+  const cls = clsDe(c);
+  const pill = c.est === "off" ? (c.sitc === "ni" ? "Não instalada" : esc(c.situacao.replace(/^Em /i, ""))) : ROTULO[c.est];
   let foot;
   if (c.est === "off") foot = `<span class="obs">${esc(c.observacoes) || "Sem limpeza programada"}</span>`;
   else if (c.est === "none") foot = `<span>Registrar 1ª limpeza no Monday</span>`;
@@ -598,7 +633,7 @@ function renderTicker(lista, operando, emDia, conf, realMes, prevMes){
   if (fut.length > 3) add("m-info", "CONFERIR", `<b>${fut.length} cortinas</b> com data da última limpeza no futuro (${fut.map(c => esc(c.tag)).join(", ")}) — conferir no Monday`);
   else fut.forEach(c => add("m-info", c.tag, `Data da última limpeza está no futuro (<b>${fmt(c.ult)}</b>) — conferir no Monday`));
   lista.filter(c => c.est === "off")
-    .forEach(c => add("m-off", c.tag, `${esc(c.local)} — <b>${esc(c.situacao)}</b>${c.os ? ` · OS <b>${esc(c.os)}</b>` : ""}${c.responsavel ? ` · ${esc(c.responsavel)}` : ""}${c.observacoes ? ` · ${esc(c.observacoes)}` : ""}`));
+    .forEach(c => add(c.sitc === "ni" ? "m-ni" : "m-man", c.tag, `${esc(c.local)} — <b>${esc(c.situacao)}</b>${c.os ? ` · OS <b>${esc(c.os)}</b>` : ""}${c.responsavel ? ` · ${esc(c.responsavel)}` : ""}${c.observacoes ? ` · ${esc(c.observacoes)}` : ""}`));
 
   add("m-ok", "", `Conformidade de limpeza: <b>${conf}%</b> (${emDia} de ${operando.length} cortinas em operação no prazo)`);
   add("m-ok", "", `${MES_LONGO[H.getMonth()][0].toUpperCase() + MES_LONGO[H.getMonth()].slice(1)}: <b>${realMes}</b> limpezas realizadas · <b>${prevMes}</b> previstas até o fim do mês`);
@@ -705,7 +740,9 @@ function listaDetalhe(k, v){
       return {t:`Limpezas de ${nomeMes}`, s:`${feitas.length} realizadas · ${afazer.length} a fazer até ${fmt(fimMes)}`, rows:[...afazer.sort(porPrazo), ...feitas.map(c => ({...c, feita:true}))]};
     }
     case "bad":  return {t:"Limpezas vencidas", s:"Ordenadas pelo maior atraso", rows:L.filter(c => c.est === "bad").sort(porPrazo)};
-    case "off":  return {t:"Cortinas fora de operação", s:"Situação diferente de \"Operando\" no Monday", rows:L.filter(c => c.est === "off")};
+    case "op":   return {t:"Cortinas operando", s:"Situação \"Operando\" no Monday", rows:L.filter(c => c.est !== "off").sort(porPrazo)};
+    case "man":  return {t:"Cortinas em manutenção", s:"Situação \"Em manutenção\" no Monday", rows:L.filter(c => c.est === "off" && c.sitc === "man")};
+    case "ni":   return {t:"Cortinas não instaladas", s:"Situação \"Não instalada\" no Monday", rows:L.filter(c => c.est === "off" && c.sitc === "ni")};
     case "prox": return {t:"Próximas limpezas", s:"Todas as cortinas em operação pela data da próxima limpeza", rows:L.filter(c => c.est !== "off").sort((a,b) => (a.prox||0) - (b.prox||0))};
     case "tag": { const c = L.find(x => x.tag === v); return {t:`Cortina ${v}`, s:c ? c.local : "", rows:c ? [c] : []}; }
   }
@@ -730,7 +767,7 @@ function abrirDetalhe(k, v, refresh){
   $("det-body").innerHTML = d.rows.length ? `
     <div class="tbl-wrap"><table class="det">
       <thead><tr><th>TAG</th><th>Local</th><th>Estado</th><th>Última limpeza</th><th>Próxima limpeza</th><th>Prazo</th><th>OS</th><th>Responsável</th><th>Observações</th><th>Fotos</th></tr></thead>
-      <tbody>${d.rows.map(c => { const cls = c.feita ? "c-ok" : ESTADOS[c.est].c; return `
+      <tbody>${d.rows.map(c => { const cls = c.feita ? "c-ok" : clsDe(c); return `
         <tr class="${cls}">
           <td class="tg2">${esc(c.tag)}</td>
           <td>${esc(c.local)}</td>
