@@ -76,7 +76,7 @@ button.wd:hover{border-color:var(--brand);box-shadow:0 8px 22px rgba(15,122,61,.
 @media (prefers-reduced-motion:no-preference){.wd.s-man.on,.wd.s-ni.on{animation:alerta 2.4s ease-in-out infinite}}
 
 /* ===== área de trabalho ===== */
-.desktop{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 400px;grid-template-rows:auto minmax(0,1fr);gap:14px;
+.desktop{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 400px;grid-template-rows:minmax(0,1fr) clamp(210px,25vh,280px);gap:14px;
   padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 #w-agenda{grid-column:2;grid-row:1/3}
 
@@ -123,6 +123,9 @@ button.wd:hover{border-color:var(--brand);box-shadow:0 8px 22px rgba(15,122,61,.
 
 /* planejamento (gráfico) */
 #w-plan .wbody{display:flex;flex-direction:column;gap:8px;overflow:hidden}
+#w-monitor .wbody{scroll-behavior:auto}
+.toast{position:fixed;z-index:60;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(64px + env(safe-area-inset-bottom,0px));background:var(--brand-2);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;box-shadow:0 10px 30px rgba(20,36,26,.25)}
+.toast b{font-family:var(--f-num)}
 .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12.5px;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend i{width:12px;height:12px;border-radius:3px;background:var(--c)}
@@ -235,6 +238,7 @@ table.det{width:100%;border-collapse:collapse;font-size:14px}
   #w-agenda{grid-column:auto;grid-row:auto}
   .wbody{overflow:visible}
   #w-plan .wbody{min-height:280px}
+  .desktop{grid-template-rows:none}
 }
 @media (max-width:560px){
   .wd-v{font-size:26px}
@@ -346,6 +350,7 @@ table.det{width:100%;border-collapse:collapse;font-size:14px}
       <div class="clock"><b id="clk-h">--:--:--</b><span id="clk-d">--/--/----</span></div>
     </div>
   </footer>
+  <div class="toast" id="toast" role="status" hidden></div>
 </div>
 
 <!-- Janela de detalhes (abre ao clicar num indicador ou cartão) -->
@@ -365,7 +370,7 @@ table.det{width:100%;border-collapse:collapse;font-size:14px}
 const DATA_URL = "data/latest.json";
 const HIST_URL = "data/historico.json";
 const ALERTA_DIAS = 10;          // "A vencer" quando faltam 10 dias ou menos
-const RECARREGAR_MIN = 5;        // busca os dados de novo a cada 5 min
+const RECARREGAR_MIN = 2;        // busca os dados de novo a cada 2 min
 const DADOS_VELHOS_H = 3;        // avisa se os dados tiverem mais de 3 h
 const MESES_ATRAS = 4, MESES_FRENTE = 7;   // janela do gráfico de planejamento
 
@@ -675,7 +680,9 @@ async function carregar(){
   try{
     const r = await fetch(`${DATA_URL}?t=${Date.now()}`, {cache:"no-store"});
     if (!r.ok) throw new Error(r.status);
-    DADOS = await r.json(); erroCarga = false;
+    const novo = await r.json(); erroCarga = false;
+    if (DADOS && novo.gerado_em !== DADOS.gerado_em) avisar(`Dados atualizados do Monday · <b>${new Date(novo.gerado_em).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}</b>`);
+    DADOS = novo;
   }catch(e){
     erroCarga = true;
     if (!DADOS){ $("grid").innerHTML = `<div class="empty">Não foi possível carregar <b>data/latest.json</b>. Rode a automação "Atualizar dados do Monday" no GitHub (aba Actions).</div>`; renderSync(); return; }
@@ -801,6 +808,34 @@ function configurarDetalhes(){
 }
 
 const redesenhar = () => requestAnimationFrame(() => LISTA.length && desenharGrafico(serieMensal(LISTA)));
+
+/* ================= Aviso de atualização ================= */
+let toastT = null;
+function avisar(html){
+  const t = $("toast"); t.innerHTML = html; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 8000);
+}
+
+/* ================= Rolagem automática do Monitor (TV) =================
+   Quando as cortinas não cabem na janela, a lista desce devagar até o fim,
+   espera e volta ao topo. Para quando o mouse está em cima. */
+(function rolagemAutomatica(){
+  const box = document.querySelector("#w-monitor .wbody");
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let pausa = false, fase = "topo", espera = 0;
+  box.addEventListener("mouseenter", () => pausa = true);
+  box.addEventListener("mouseleave", () => pausa = false);
+  setInterval(() => {
+    const max = box.scrollHeight - box.clientHeight;
+    if (pausa || max < 8 || !$("det").hidden) return;
+    if (espera > 0){ espera -= 50; return; }
+    if (fase === "topo"){ fase = "descendo"; espera = 8000; return; }
+    if (fase === "descendo"){
+      box.scrollTop = Math.min(max, box.scrollTop + 1);
+      if (box.scrollTop >= max - 1){ fase = "fim"; espera = 8000; }
+    } else if (fase === "fim"){ box.scrollTop = 0; fase = "topo"; }
+  }, 50);
+})();
 
 /* ================= Início ================= */
 configurarDetalhes();
