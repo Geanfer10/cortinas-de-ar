@@ -76,7 +76,7 @@ button.wd:hover{border-color:var(--brand);box-shadow:0 8px 22px rgba(15,122,61,.
 @media (prefers-reduced-motion:no-preference){.wd.s-man.on,.wd.s-ni.on{animation:alerta 2.4s ease-in-out infinite}}
 
 /* ===== área de trabalho ===== */
-.desktop{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 400px;grid-template-rows:minmax(0,1fr) clamp(210px,25vh,280px);gap:14px;
+.desktop{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:minmax(0,1fr) clamp(180px,22vh,280px);gap:14px;
   padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 #w-agenda{grid-column:2;grid-row:1/3}
 
@@ -91,8 +91,8 @@ button.wd:hover{border-color:var(--brand);box-shadow:0 8px 22px rgba(15,122,61,.
 .wbody{flex:1;min-height:0;overflow:auto;padding:14px}
 
 /* filtros (chips) */
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-.chip{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--win);cursor:pointer;font-size:13px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;flex:none;max-width:70%}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--win);cursor:pointer;font-size:13px;color:var(--muted)}
 .chip i{width:8px;height:8px;border-radius:50%;background:var(--c)}
 .chip b{font-family:var(--f-num);color:var(--ink)}
 .chip:hover{border-color:var(--c)}
@@ -101,7 +101,31 @@ button.wd:hover{border-color:var(--brand);box-shadow:0 8px 22px rgba(15,122,61,.
 
 /* cartões */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
-@media (min-width:1700px){.grid{grid-template-columns:repeat(7,minmax(0,1fr))}}
+@media (min-width:1201px){
+  #w-monitor .wbody{overflow:hidden}
+  #w-monitor .wbody.rola{overflow:auto}
+  .grid.fit{grid-template-columns:repeat(var(--cols,7),minmax(0,1fr))}
+}
+/* densidade: o painel compacta os cartões até caber tudo na tela, sem barra de rolagem */
+.pl-s,.dt-c{display:none}
+.dt-c{font-family:var(--f-num);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap;border-top:1px solid var(--line-2);padding-top:5px}
+.dt-c i{font-style:normal;color:var(--muted)}
+.grid.d1 .card{gap:5px;padding:8px 9px 7px 12px}
+.grid.d1 .loc{min-height:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+.grid.d1 .dates{display:none}
+.grid.d1 .dt-c{display:block}
+.grid.d1 .pl-l{display:none}
+.grid.d1 .pl-s{display:inline}
+.grid.d1 .tag{font-size:18px}
+.grid.d1 .meta{margin-top:0}
+.grid.d1 .foot{white-space:nowrap}
+.grid.d1 .foot .obs{overflow:hidden;text-overflow:ellipsis}
+.grid.d2 .bar{display:none}
+.grid.d2 .cic{display:none}
+.grid.d2 .foot{justify-content:flex-end}
+.grid.d3 .card{gap:3px}
+.grid.d3 .tag{font-size:16px}
+.grid.d3 .meta,.grid.d3 .foot,.grid.d3 .loc{font-size:12px}
 .card{position:relative;background:var(--win);border:1px solid var(--line);border-radius:8px;padding:10px 11px 9px 14px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
 .card::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--c)}
 .card-h{display:flex;justify-content:space-between;align-items:center;gap:6px}
@@ -129,7 +153,7 @@ button.wd:hover{border-color:var(--brand);box-shadow:0 8px 22px rgba(15,122,61,.
 .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12.5px;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend i{width:12px;height:12px;border-radius:3px;background:var(--c)}
-.chart{position:relative;flex:1;min-height:150px}
+.chart{position:relative;flex:1;min-height:100px}
 .chart svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .chart text{font-family:var(--f-num);font-size:12px;fill:var(--muted)}
 .chart text.val{fill:var(--ink);font-weight:700;font-size:13px}
@@ -239,6 +263,8 @@ table.det{width:100%;border-collapse:collapse;font-size:14px}
   .wbody{overflow:visible}
   #w-plan .wbody{min-height:280px}
   .desktop{grid-template-rows:none}
+  #w-monitor .titlebar{flex-wrap:wrap}
+  .chips{max-width:100%;justify-content:flex-start}
 }
 @media (max-width:560px){
   .wd-v{font-size:26px}
@@ -305,9 +331,9 @@ table.det{width:100%;border-collapse:collapse;font-size:14px}
       <div class="titlebar">
         <span class="appicon">CA</span>
         <div class="wtitle"><strong id="t-monitor">Monitor de Limpeza — Cortinas de Ar</strong><span id="mon-sub">—</span></div>
+        <div class="chips" id="chips" role="group" aria-label="Filtrar por estado"></div>
       </div>
       <div class="wbody">
-        <div class="chips" id="chips" role="group" aria-label="Filtrar por estado"></div>
         <div class="grid" id="grid"></div>
       </div>
     </section>
@@ -505,6 +531,7 @@ function render(){
   const vis = lista.filter(c => casa(c, filtro));
   $("mon-sub").textContent = `${plural(lista.length,"cortina","cortinas")} · periodicidade bimestral (60 dias)` + (filtro === "all" ? "" : ` · exibindo ${vis.length}`);
   $("grid").innerHTML = vis.length ? vis.map(card).join("") : `<div class="empty">Nenhuma cortina em "${ESTADOS[filtro].l}".</div>`;
+  ajustarGrade();
   $("grid").querySelectorAll(".card").forEach(el => {
     el.onclick = () => abrirDetalhe("tag", el.dataset.tag);
     el.onkeydown = e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); abrirDetalhe("tag", el.dataset.tag); } };
@@ -536,17 +563,19 @@ function render(){
   renderSync();
 }
 
+const pillCurto = c => c.est === "off" ? (c.sitc === "ni" ? "Não inst." : "Manut.") : ({ok:"Em dia", warn:"A vencer", bad:"Vencida", none:"S/ reg."})[c.est];
 function card(c){
   const cls = clsDe(c);
   const pill = c.est === "off" ? (c.sitc === "ni" ? "Não instalada" : esc(c.situacao.replace(/^Em /i, ""))) : ROTULO[c.est];
   let foot;
   if (c.est === "off") foot = `<span class="obs">${esc(c.observacoes) || "Sem limpeza programada"}</span>`;
   else if (c.est === "none") foot = `<span>Registrar 1ª limpeza no Monday</span>`;
-  else foot = `<span>Ciclo ${Math.round(c.pct)}%</span><span>${c.falta < 0 ? `<b>${-c.falta} d</b> atraso` : c.falta === 0 ? `<b>hoje</b>` : `faltam <b>${c.falta} d</b>`}</span>`;
+  else foot = `<span class="cic">Ciclo ${Math.round(c.pct)}%</span><span>${c.falta < 0 ? `<b>${-c.falta} d</b> atraso` : c.falta === 0 ? `<b>hoje</b>` : `faltam <b>${c.falta} d</b>`}</span>`;
   return `<article class="card ${cls}" data-tag="${esc(c.tag)}" tabindex="0" role="button" aria-label="Detalhes de ${esc(c.tag)}">
-    <div class="card-h"><span class="tag">${esc(c.tag)}${temFoto(c) ? CAM : ""}</span><span class="pill">${pill}</span></div>
+    <div class="card-h"><span class="tag">${esc(c.tag)}${temFoto(c) ? CAM : ""}</span><span class="pill"><span class="pl-l">${pill}</span><span class="pl-s">${pillCurto(c)}</span></span></div>
     <div class="loc">${esc(c.local)}</div>
     <dl class="dates"><div><dt>Última</dt><dd>${fmtC(c.ult)}</dd></div><div><dt>Próxima</dt><dd>${fmtC(c.prox)}</dd></div></dl>
+    <div class="dt-c" title="Última limpeza → próxima limpeza">${c.ult ? ddmm(c.ult) : "—"} <i>→</i> ${c.prox ? ddmm(c.prox) : "—"}</div>
     <div class="meta"><span>OS <b class="${c.os ? "" : "vazio"}">${esc(c.os) || "—"}</b></span><span class="rp" title="${esc(c.responsavel)}">${c.responsavel ? esc(c.responsavel) : `<i class="vazio">sem responsável</i>`}</span></div>
     <div class="bar"><i style="width:${c.pct}%"></i></div>
     <div class="foot">${foot}</div>
@@ -810,6 +839,27 @@ function configurarDetalhes(){
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("det").hidden) fecharDetalhe(); });
 }
 
+/* ================= Ajuste automático: todas as cortinas cabem na tela ================= */
+function ajustarGrade(){
+  const box = document.querySelector("#w-monitor .wbody"), g = $("grid");
+  if (!box || !g.children.length) return;
+  if (!matchMedia("(min-width:1201px)").matches){ g.className = "grid"; box.classList.remove("rola"); return; }
+  box.classList.remove("rola");
+  const cabe = () => box.scrollHeight <= box.clientHeight + 1;
+  const larguraUtil = g.clientWidth || box.clientWidth;
+  for (let d = 0; d <= 3; d++){
+    for (let cols = 5; cols <= 10; cols++){
+      if (larguraUtil / cols < 140) break;
+      if (d === 0 && larguraUtil / cols < 200) continue;   // cartão completo precisa de largura
+      g.className = "grid fit" + (d ? " d1" : "") + (d >= 2 ? " d2" : "") + (d >= 3 ? " d3" : "");
+      g.style.setProperty("--cols", cols);
+      if (cabe()) return;
+    }
+  }
+  box.classList.add("rola");   // tela pequena demais: libera a rolagem para não esconder cortinas
+}
+new ResizeObserver(() => requestAnimationFrame(ajustarGrade)).observe(document.querySelector("#w-monitor .wbody"));
+
 const redesenhar = () => requestAnimationFrame(() => LISTA.length && desenharGrafico(serieMensal(LISTA)));
 
 /* ================= Aviso de atualização ================= */
@@ -818,27 +868,6 @@ function avisar(html){
   const t = $("toast"); t.innerHTML = html; t.hidden = false;
   clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 8000);
 }
-
-/* ================= Rolagem automática do Monitor (TV) =================
-   Quando as cortinas não cabem na janela, a lista desce devagar até o fim,
-   espera e volta ao topo. Para quando o mouse está em cima. */
-(function rolagemAutomatica(){
-  const box = document.querySelector("#w-monitor .wbody");
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  let pausa = false, fase = "topo", espera = 0;
-  box.addEventListener("mouseenter", () => pausa = true);
-  box.addEventListener("mouseleave", () => pausa = false);
-  setInterval(() => {
-    const max = box.scrollHeight - box.clientHeight;
-    if (pausa || max < 8 || !$("det").hidden) return;
-    if (espera > 0){ espera -= 50; return; }
-    if (fase === "topo"){ fase = "descendo"; espera = 8000; return; }
-    if (fase === "descendo"){
-      box.scrollTop = Math.min(max, box.scrollTop + 1);
-      if (box.scrollTop >= max - 1){ fase = "fim"; espera = 8000; }
-    } else if (fase === "fim"){ box.scrollTop = 0; fase = "topo"; }
-  }, 50);
-})();
 
 /* ================= Início ================= */
 configurarDetalhes();
