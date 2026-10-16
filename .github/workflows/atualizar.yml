@@ -2,7 +2,7 @@ name: Atualizar dados do Monday
 
 on:
   schedule:
-    - cron: "0 * * * *"   # a cada 1 hora
+    - cron: "7,37 * * * *"   # a cada 30 min (minutos "quebrados": o GitHub atrasa menos)
   workflow_dispatch:       # botão "Run workflow" para atualizar na hora
 
 permissions:

@@ -100,13 +100,14 @@
     {
       "data": "2026-10-16",
       "total": 14,
-      "operando": 11,
-      "em_dia": 11,
+      "operando": 10,
+      "em_dia": 10,
       "a_vencer": 0,
       "vencida": 0,
       "sem_registro": 0,
-      "fora": 3,
+      "fora": 4,
       "conformidade": 100.0
     }
-  ]
+  ],
+  "registro_fotos": []
 }

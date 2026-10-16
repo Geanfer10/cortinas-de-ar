@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-16T07:11:37-03:00",
+  "gerado_em": "2026-10-16T10:23:41-03:00",
   "quadro": "🌬️ Cortinas de Ar – Limpeza",
   "board_id": 18435679675,
   "board_url": "https://messigean18s-team.monday.com/boards/18435679675",
@@ -17,7 +17,9 @@
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": ""
+      "observacoes": "",
+      "foto_antes": null,
+      "foto_depois": null
     },
     {
       "item_id": "13302786902",
@@ -30,7 +32,9 @@
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": ""
+      "observacoes": "",
+      "foto_antes": null,
+      "foto_depois": null
     },
     {
       "item_id": "13302860096",
@@ -43,20 +47,24 @@
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": ""
+      "observacoes": "",
+      "foto_antes": null,
+      "foto_depois": null
     },
     {
       "item_id": "13302780642",
       "tag": "CA-04",
       "equipamento": "Cortina de Ar",
       "local": "Sala de Pesagem / Armazenamento de Insumos",
-      "situacao": "Operando",
+      "situacao": "Em manutenção",
       "periodicidade": 60,
       "ultima_limpeza": "2026-10-16",
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": ""
+      "observacoes": "",
+      "foto_antes": null,
+      "foto_depois": null
     },
     {
       "item_id": "13302786593",
@@ -69,7 +77,9 @@
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": ""
+      "observacoes": "",
+      "foto_antes": null,
+      "foto_depois": null
     },
     {
       "item_id": "13302805799",
@@ -82,46 +92,54 @@
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": ""
+      "observacoes": "",
+      "foto_antes": null,
+      "foto_depois": null
     },
     {
       "item_id": "13302813519",
       "tag": "CA-07",
       "equipamento": "Cortina de Ar",
       "local": "Sala de Preparo de Salmoura",
-      "situacao": "Em manutenção",
+      "situacao": "Não instalada",
       "periodicidade": 60,
       "ultima_limpeza": "2026-10-16",
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": "Cortina faltando no local"
+      "observacoes": "Cortina faltando no local",
+      "foto_antes": null,
+      "foto_depois": null
     },
     {
       "item_id": "13302780575",
       "tag": "CA-08",
       "equipamento": "Cortina de Ar",
       "local": "Sala de Assepsia Despalhadeiras",
-      "situacao": "Em manutenção",
+      "situacao": "Não instalada",
       "periodicidade": 60,
       "ultima_limpeza": "2026-10-16",
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": "Cortina faltando no local"
+      "observacoes": "Cortina faltando no local",
+      "foto_antes": null,
+      "foto_depois": null
     },
     {
       "item_id": "13302786903",
       "tag": "CA-09",
       "equipamento": "Cortina de Ar",
       "local": "Sala de Assepsia Desgranadeiras",
-      "situacao": "Em manutenção",
+      "situacao": "Não instalada",
       "periodicidade": 60,
       "ultima_limpeza": "2026-10-16",
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": "Cortina faltando no local"
+      "observacoes": "Cortina faltando no local",
+      "foto_antes": null,
+      "foto_depois": null
     },
     {
       "item_id": "13302805800",
@@ -134,7 +152,9 @@
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": ""
+      "observacoes": "",
+      "foto_antes": null,
+      "foto_depois": null
     },
     {
       "item_id": "13302860206",
@@ -147,7 +167,9 @@
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": ""
+      "observacoes": "",
+      "foto_antes": null,
+      "foto_depois": null
     },
     {
       "item_id": "13302861139",
@@ -160,7 +182,9 @@
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": ""
+      "observacoes": "",
+      "foto_antes": null,
+      "foto_depois": null
     },
     {
       "item_id": "13302780411",
@@ -173,7 +197,9 @@
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": ""
+      "observacoes": "",
+      "foto_antes": null,
+      "foto_depois": null
     },
     {
       "item_id": "13302860814",
@@ -186,7 +212,9 @@
       "proxima_limpeza": "2026-12-15",
       "responsavel": "",
       "os": "",
-      "observacoes": ""
+      "observacoes": "",
+      "foto_antes": null,
+      "foto_depois": null
     }
   ]
 }
