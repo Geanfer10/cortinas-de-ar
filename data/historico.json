@@ -99,14 +99,14 @@
     },
     {
       "data": "2026-10-16",
-      "total": 14,
-      "operando": 10,
+      "total": 18,
+      "operando": 14,
       "em_dia": 10,
       "a_vencer": 0,
       "vencida": 0,
-      "sem_registro": 0,
+      "sem_registro": 4,
       "fora": 4,
-      "conformidade": 100.0
+      "conformidade": 71.4
     }
   ],
   "registro_fotos": []
