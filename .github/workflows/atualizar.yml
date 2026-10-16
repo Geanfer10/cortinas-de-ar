@@ -24,6 +24,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Instalar Pillow (reduz as fotos)
+        run: pip install --quiet pillow pillow-heif
+
       - name: Buscar dados do Monday
         env:
           MONDAY_API_TOKEN: ${{ secrets.MONDAY_API_TOKEN }}
@@ -33,7 +36,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/latest.json data/historico.json
+          git add -A data/
           if git diff --cached --quiet; then
             echo "Sem mudanças."
           else

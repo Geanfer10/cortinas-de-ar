@@ -3,8 +3,10 @@ Busca o quadro "Cortinas de Ar – Limpeza" no Monday e grava:
   - data/latest.json    -> situação atual de cada cortina
   - data/historico.json -> registro das limpezas detectadas + foto diária da conformidade
                            (alimenta os gráficos executivos do painel)
+  - data/fotos/         -> fotos de Antes e Depois anexadas no Monday (cópia reduzida em JPG)
 Roda no GitHub Actions. O token vem do secret MONDAY_API_TOKEN (nunca é impresso no log).
-Usa só a biblioteca padrão do Python (sem pip install).
+Pillow (+ pillow-heif para fotos de iPhone) é opcional: se estiver instalado, as fotos são
+reduzidas para JPG de até 1600 px; sem ele, o arquivo é salvo como veio.
 """
 import json
 import os
@@ -28,6 +30,8 @@ COL = {
     "responsavel": "text_mm85w8hs",
     "os": "text_mm85vyeq",
     "observacoes": "long_text_mm85myen",
+    "foto_antes": "file_mm86n9y3",
+    "foto_depois": "file_mm86y32t",
 }
 
 QUERY = """
@@ -43,6 +47,9 @@ query ($board: [ID!], $cols: [String!], $cursor: String) {
           id
           text
           ... on FormulaValue { display_value }
+          ... on FileValue {
+            files { ... on FileAssetValue { asset_id name created_at asset { public_url file_extension } } }
+          }
         }
       }
     }
@@ -56,6 +63,9 @@ SAIDA = PASTA / "latest.json"
 HISTORICO = PASTA / "historico.json"
 ALERTA_DIAS = 10          # mesma regra do painel: "a vencer" com 10 dias ou menos
 MAX_FOTOS = 400           # guarda ~13 meses de fotos diárias
+PASTA_IMG = PASTA / "fotos"
+LADO_MAX = 1600           # px, maior lado da foto salva
+EXT_IMG = {"jpg", "jpeg", "png", "webp", "heic", "heif", "gif", "bmp"}
 
 
 def chamar_api(token, variaveis):
@@ -83,6 +93,43 @@ def para_data(txt):
         return None
 
 
+def baixar_foto(coluna, tag, lado, usadas):
+    """Salva a foto mais recente da coluna em data/fotos e devolve {arquivo, nome, enviada_em}."""
+    arquivos = [f for f in (coluna or {}).get("files") or [] if f and f.get("asset")]
+    arquivos = [f for f in arquivos if (f["asset"].get("file_extension") or "").lower().lstrip(".") in EXT_IMG]
+    if not arquivos:
+        return None
+    f = max(arquivos, key=lambda x: x.get("created_at") or "")
+    destino = PASTA_IMG / f"{tag}_{lado}_{f['asset_id']}.jpg"
+    rel = f"data/fotos/{destino.name}"
+    usadas.add(destino.name)
+    info = {"arquivo": rel, "nome": f.get("name") or "", "enviada_em": (f.get("created_at") or "")[:19]}
+    if destino.exists():
+        return info
+    try:
+        with urllib.request.urlopen(f["asset"]["public_url"], timeout=120) as resp:
+            bruto = resp.read()
+    except Exception as e:  # uma foto com problema não derruba a atualização
+        print(f"Aviso: não foi possível baixar a foto {lado} de {tag}: {e}")
+        return None
+    PASTA_IMG.mkdir(parents=True, exist_ok=True)
+    try:
+        from io import BytesIO
+        from PIL import Image, ImageOps
+        try:
+            import pillow_heif
+            pillow_heif.register_heif_opener()
+        except ImportError:
+            pass
+        img = ImageOps.exif_transpose(Image.open(BytesIO(bruto))).convert("RGB")
+        img.thumbnail((LADO_MAX, LADO_MAX))
+        img.save(destino, "JPEG", quality=82, optimize=True)
+    except Exception:
+        destino.write_bytes(bruto)  # sem Pillow: guarda o original
+    print(f"Foto {lado} de {tag} salva ({destino.name})")
+    return info
+
+
 def main():
     token = os.environ.get("MONDAY_API_TOKEN", "").strip()
     if not token:
@@ -100,6 +147,7 @@ def main():
             break
 
     cortinas = []
+    fotos_usadas = set()
     for it in itens:
         v = {c["id"]: c for c in it["column_values"]}
         txt = lambda chave: (v.get(COL[chave], {}).get("text") or "").strip()
@@ -126,7 +174,15 @@ def main():
             "responsavel": txt("responsavel"),
             "os": txt("os"),
             "observacoes": txt("observacoes"),
+            "foto_antes": baixar_foto(v.get(COL["foto_antes"]), it["name"].strip(), "antes", fotos_usadas),
+            "foto_depois": baixar_foto(v.get(COL["foto_depois"]), it["name"].strip(), "depois", fotos_usadas),
         })
+
+    # apaga do repositório as fotos que foram trocadas ou removidas no Monday
+    if PASTA_IMG.exists():
+        for arq in PASTA_IMG.iterdir():
+            if arq.is_file() and arq.name not in fotos_usadas and arq.name != ".gitkeep":
+                arq.unlink()
 
     cortinas.sort(key=lambda c: c["tag"])
 
