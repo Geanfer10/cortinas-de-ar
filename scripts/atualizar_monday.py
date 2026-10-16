@@ -238,7 +238,14 @@ def atualizar_historico(cortinas):
     agora = datetime.now(BRT)
     hoje = agora.date()
 
-    # 1) cada data de "Última Limpeza" nova vira um registro de limpeza realizada
+    # 1) cada data de "Última Limpeza" nova vira um registro de limpeza realizada.
+    #    Registro que foi desfeito no Monday (data apagada ou trocada por uma anterior,
+    #    ou cortina excluída do quadro) sai do histórico: não conta como limpeza feita.
+    atual = {c["tag"]: c["ultima_limpeza"] for c in cortinas}
+    hist["limpezas"] = [
+        l for l in hist["limpezas"]
+        if l["tag"] in atual and atual[l["tag"]] and atual[l["tag"]] >= l["data"]
+    ]
     ja = {(l["tag"], l["data"]) for l in hist["limpezas"]}
     for c in cortinas:
         if c["ultima_limpeza"] and (c["tag"], c["ultima_limpeza"]) not in ja:

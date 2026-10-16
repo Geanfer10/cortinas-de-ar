@@ -19,12 +19,6 @@
       "registrado_em": "2026-10-15T14:59:08-03:00"
     },
     {
-      "tag": "CA-04",
-      "local": "Sala de Pesagem / Armazenamento de Insumos",
-      "data": "2026-10-16",
-      "registrado_em": "2026-10-15T14:59:08-03:00"
-    },
-    {
       "tag": "CA-05",
       "local": "Sala de Assepsia Envase Asséptico",
       "data": "2026-10-16",
@@ -33,48 +27,6 @@
     {
       "tag": "CA-06",
       "local": "Sala de Assepsia Seleção de Tomate",
-      "data": "2026-10-16",
-      "registrado_em": "2026-10-15T14:59:08-03:00"
-    },
-    {
-      "tag": "CA-07",
-      "local": "Sala de Preparo de Salmoura",
-      "data": "2026-10-16",
-      "registrado_em": "2026-10-15T14:59:08-03:00"
-    },
-    {
-      "tag": "CA-08",
-      "local": "Sala de Assepsia Despalhadeiras",
-      "data": "2026-10-16",
-      "registrado_em": "2026-10-15T14:59:08-03:00"
-    },
-    {
-      "tag": "CA-09",
-      "local": "Sala de Assepsia Desgranadeiras",
-      "data": "2026-10-16",
-      "registrado_em": "2026-10-15T14:59:08-03:00"
-    },
-    {
-      "tag": "CA-10",
-      "local": "Desenvase – Entrada",
-      "data": "2026-10-16",
-      "registrado_em": "2026-10-15T14:59:08-03:00"
-    },
-    {
-      "tag": "CA-11",
-      "local": "Desenvase – Esteira 1",
-      "data": "2026-10-16",
-      "registrado_em": "2026-10-15T14:59:08-03:00"
-    },
-    {
-      "tag": "CA-12",
-      "local": "Desenvase – Esteira 2",
-      "data": "2026-10-16",
-      "registrado_em": "2026-10-15T14:59:08-03:00"
-    },
-    {
-      "tag": "CA-13",
-      "local": "Desenvase – Esteira 3",
       "data": "2026-10-16",
       "registrado_em": "2026-10-15T14:59:08-03:00"
     },

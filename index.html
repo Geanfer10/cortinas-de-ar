@@ -269,7 +269,7 @@ table.det{width:100%;border-collapse:collapse;font-size:14px}
       <span class="wd-l" id="w-real-l">Realizadas no mês</span>
       <span class="wd-v" id="w-real">—</span>
       <div class="meter"><i id="w-real-m" style="width:0"></i></div>
-      <span class="wd-s" id="w-real-s">—</span>
+      <span class="wd-s" id="w-real-s" style="white-space:normal">—</span>
     </button>
     <button class="wd" id="wd-venc" data-k="bad">
       <span class="wd-l">Vencidas</span>
@@ -432,7 +432,8 @@ function serieMensal(lista){
   for (let k = atual - MESES_ATRAS; k <= atual + MESES_FRENTE; k++) meses.push({k, real:0, prev:0});
   const idx = k => meses.find(m => m.k === k);
 
-  (HIST.limpezas || []).forEach(l => { const d = parseData(l.data); const m = d && idx(chaveMes(d)); if (m && d <= H) m.real++; });
+  const tags = new Set(lista.map(c => c.tag));
+  (HIST.limpezas || []).forEach(l => { if (!tags.has(l.tag)) return; const d = parseData(l.data); const m = d && idx(chaveMes(d)); if (m && d <= H) m.real++; });
 
   const fim = atual + MESES_FRENTE;
   lista.filter(c => c.est !== "off").forEach(c => {
@@ -469,7 +470,9 @@ function render(){
   $("w-real-l").textContent = `Realizadas em ${MES_LONGO[H.getMonth()]}`;
   $("w-real").innerHTML = `${realMes}<small> / ${realMes + prevMes}</small>`;
   $("w-real-m").style.width = (realMes + prevMes ? realMes/(realMes+prevMes)*100 : 100) + "%";
-  $("w-real-s").innerHTML = prevMes ? `faltam <b>${prevMes}</b> até o fim do mês` : `nenhuma pendente este mês`;
+  const nFora = lista.filter(c => c.est === "off").length;
+  $("w-real-s").innerHTML = (prevMes ? `faltam <b>${prevMes}</b>` : `nenhuma pendente`) +
+    (nFora ? ` · <b style="color:var(--ni)">${nFora}</b> fora de operação` : "");
 
   const venc = lista.filter(c => c.est === "bad").sort((a,b) => a.falta - b.falta);
   $("w-venc").textContent = venc.length;
