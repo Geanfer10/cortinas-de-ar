@@ -71,7 +71,7 @@
       "vencida": 0,
       "sem_registro": 0,
       "fora": 3,
-      "conformidade": 100.0
+      "conformidade": null
     },
     {
       "data": "2026-10-16",
@@ -82,7 +82,8 @@
       "vencida": 0,
       "sem_registro": 0,
       "fora": 7,
-      "conformidade": 100.0
+      "realizadas_mes": 10,
+      "conformidade": 58.8
     }
   ],
   "registro_fotos": []

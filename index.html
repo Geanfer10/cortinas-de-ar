@@ -62,7 +62,8 @@ button{font:inherit;color:inherit}
 .wd.conf .wd-l,.wd.conf .wd-s{grid-column:1/-1}
 .spark{height:46px;width:100%}
 .meter{height:6px;border-radius:3px;background:var(--line-2);overflow:hidden;margin-top:4px}
-.meter i{display:block;height:100%;border-radius:3px;background:var(--serie)}
+.meter{background:color-mix(in srgb,var(--ni) 30%,#fff)}
+.meter i{display:block;height:100%;border-radius:3px 0 0 3px;background:var(--ok)}
 button.wd{font:inherit;color:inherit;text-align:left;cursor:pointer;transition:border-color .15s,box-shadow .15s}
 button.wd:hover{border-color:var(--brand);box-shadow:0 8px 22px rgba(15,122,61,.14)}
 .wd.alert-bad .wd-v{color:var(--bad)}
@@ -484,9 +485,13 @@ function render(){
   const conf = operando.length ? Math.round(emDia/operando.length*100) : 0;
 
   /* ---- widgets ---- */
-  $("w-conf").textContent = conf + "%";
-  $("w-conf").style.color = conf >= 90 ? "var(--ok)" : conf >= 70 ? "var(--warn)" : "var(--bad)";
-  $("w-conf-s").innerHTML = `<b>${emDia} de ${operando.length}</b> no prazo · meta 100%`;
+  // base = TODAS as cortinas do quadro; realizada = Última Limpeza dentro do mês atual
+  const feitasMes = lista.filter(c => c.ult && c.ult <= H && c.ult.getMonth() === H.getMonth() && c.ult.getFullYear() === H.getFullYear());
+  const nFeitas = feitasMes.length, nTotal = lista.length, nNao = nTotal - nFeitas;
+  const confMes = nTotal ? Math.round(nFeitas / nTotal * 100) : 0;
+  $("w-conf").textContent = confMes + "%";
+  $("w-conf").style.color = confMes >= 90 ? "var(--ok)" : confMes >= 70 ? "var(--warn)" : "var(--bad)";
+  $("w-conf-s").innerHTML = `<b>${nFeitas} de ${nTotal}</b> cortinas limpas · meta 100%`;
   sparkline();
 
   const meses = serieMensal(lista);
@@ -494,11 +499,9 @@ function render(){
   const realMes = mAtual.real;
   const prevMes = mAtual.prev;                         // ainda a fazer até o fim do mês
   $("w-real-l").textContent = `Realizadas em ${MES_LONGO[H.getMonth()]}`;
-  $("w-real").innerHTML = `${realMes}<small> / ${realMes + prevMes}</small>`;
-  $("w-real-m").style.width = (realMes + prevMes ? realMes/(realMes+prevMes)*100 : 100) + "%";
-  const nFora = lista.filter(c => c.est === "off").length;
-  $("w-real-s").innerHTML = (prevMes ? `faltam <b>${prevMes}</b>` : `nenhuma pendente`) +
-    (nFora ? ` · <b style="color:var(--ni)">${nFora}</b> fora de operação` : "");
+  $("w-real").innerHTML = `${nFeitas}<small> / ${nTotal}</small>`;
+  $("w-real-m").style.width = (nTotal ? nFeitas / nTotal * 100 : 0) + "%";
+  $("w-real-s").innerHTML = `<b style="color:var(--ok)">${nFeitas}</b> realizadas · <b style="color:var(--ni)">${nNao}</b> não realizadas`;
 
   const venc = lista.filter(c => c.est === "bad").sort((a,b) => a.falta - b.falta);
   $("w-venc").textContent = venc.length;
@@ -673,7 +676,8 @@ function renderTicker(lista, operando, emDia, conf, realMes, prevMes){
   lista.filter(c => c.est === "off")
     .forEach(c => add(c.sitc === "ni" ? "m-ni" : "m-man", c.tag, `${esc(c.local)} — <b>${esc(c.situacao)}</b>${c.os ? ` · OS <b>${esc(c.os)}</b>` : ""}${c.responsavel ? ` · ${esc(c.responsavel)}` : ""}${c.observacoes ? ` · ${esc(c.observacoes)}` : ""}`));
 
-  add("m-ok", "", `Conformidade de limpeza: <b>${conf}%</b> (${emDia} de ${operando.length} cortinas em operação no prazo)`);
+  const feitas = lista.filter(c => c.ult && c.ult <= H && c.ult.getMonth() === H.getMonth() && c.ult.getFullYear() === H.getFullYear()).length;
+  add(feitas === lista.length ? "m-ok" : "m-warn", "", `Conformidade de limpeza em ${MES_LONGO[H.getMonth()]}: <b>${lista.length ? Math.round(feitas/lista.length*100) : 0}%</b> · ${feitas} de ${lista.length} cortinas limpas · ${lista.length - feitas} não realizadas`);
   add("m-ok", "", `${MES_LONGO[H.getMonth()][0].toUpperCase() + MES_LONGO[H.getMonth()].slice(1)}: <b>${realMes}</b> limpezas realizadas · <b>${prevMes}</b> previstas até o fim do mês`);
   const prox = operando.filter(c => c.prox && c.falta >= 0).sort((a,b) => a.prox - b.prox)[0];
   if (prox) add("m-ok", "", `Próxima limpeza: <b>${esc(prox.tag)}</b> · ${esc(prox.local)} em <b>${fmt(prox.prox)}</b>`);
@@ -773,11 +777,12 @@ function listaDetalhe(k, v){
   const porPrazo = (a,b) => (a.falta ?? -9999) - (b.falta ?? -9999);
   const nomeMes = MES_LONGO[H.getMonth()];
   switch (k){
-    case "conf": return {t:"Conformidade de limpeza", s:"Cortinas em operação, da mais urgente para a mais folgada", rows:L.filter(c => c.est !== "off").sort(porPrazo)};
+    case "conf":
     case "mes": {
       const feitas = L.filter(c => c.ult && c.ult <= H && c.ult.getMonth() === H.getMonth() && c.ult.getFullYear() === H.getFullYear());
-      const afazer = L.filter(c => c.est !== "off" && !feitas.includes(c) && (!c.prox || c.prox <= fimMes));
-      return {t:`Limpezas de ${nomeMes}`, s:`${feitas.length} realizadas · ${afazer.length} a fazer até ${fmt(fimMes)}`, rows:[...afazer.sort(porPrazo), ...feitas.map(c => ({...c, feita:true}))]};
+      const naoFeitas = L.filter(c => !feitas.includes(c));
+      const pct = L.length ? Math.round(feitas.length / L.length * 100) : 0;
+      return {t:`Limpezas de ${nomeMes} · ${pct}%`, s:`${feitas.length} realizadas · ${naoFeitas.length} não realizadas · total ${L.length}`, rows:[...naoFeitas.sort(porPrazo), ...feitas.map(c => ({...c, feita:true}))]};
     }
     case "bad":  return {t:"Limpezas vencidas", s:"Ordenadas pelo maior atraso", rows:L.filter(c => c.est === "bad").sort(porPrazo)};
     case "op":   return {t:"Cortinas operando", s:"Situação \"Operando\" no Monday", rows:L.filter(c => c.est !== "off").sort(porPrazo)};

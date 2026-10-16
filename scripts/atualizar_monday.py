@@ -273,9 +273,13 @@ def atualizar_historico(cortinas):
     for c in cortinas:
         cont[estado(c, hoje)] += 1
     operando = len(cortinas) - cont["fora"]
+    feitas_mes = sum(1 for c in cortinas if c["ultima_limpeza"]
+                     and c["ultima_limpeza"][:7] == hoje.isoformat()[:7] and c["ultima_limpeza"] <= hoje.isoformat())
     foto = {
         "data": hoje.isoformat(), "total": len(cortinas), "operando": operando, **cont,
-        "conformidade": round((cont["em_dia"] + cont["a_vencer"]) / operando * 100, 1) if operando else None,
+        "realizadas_mes": feitas_mes,
+        # conformidade = cortinas limpas no mês / TODAS as cortinas do quadro
+        "conformidade": round(feitas_mes / len(cortinas) * 100, 1) if cortinas else None,
     }
     hist["fotos"] = [f for f in hist["fotos"] if f["data"] != foto["data"]] + [foto]
     hist["fotos"] = sorted(hist["fotos"], key=lambda f: f["data"])[-MAX_FOTOS:]
