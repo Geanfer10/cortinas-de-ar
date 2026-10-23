@@ -160,12 +160,12 @@
     {
       "data": "2026-10-23",
       "total": 17,
-      "operando": 10,
+      "operando": 13,
       "em_dia": 10,
       "a_vencer": 0,
       "vencida": 0,
-      "sem_registro": 0,
-      "fora": 7,
+      "sem_registro": 3,
+      "fora": 4,
       "realizadas_mes": 10,
       "conformidade": 58.8
     }
