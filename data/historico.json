@@ -192,6 +192,18 @@
       "fora": 4,
       "realizadas_mes": 10,
       "conformidade": 58.8
+    },
+    {
+      "data": "2026-10-26",
+      "total": 17,
+      "operando": 13,
+      "em_dia": 10,
+      "a_vencer": 0,
+      "vencida": 0,
+      "sem_registro": 3,
+      "fora": 4,
+      "realizadas_mes": 10,
+      "conformidade": 58.8
     }
   ],
   "registro_fotos": []
