@@ -294,6 +294,18 @@
       "fora": 4,
       "realizadas_mes": 0,
       "conformidade": 0.0
+    },
+    {
+      "data": "2026-11-02",
+      "total": 17,
+      "operando": 13,
+      "em_dia": 13,
+      "a_vencer": 0,
+      "vencida": 0,
+      "sem_registro": 0,
+      "fora": 4,
+      "realizadas_mes": 0,
+      "conformidade": 0.0
     }
   ],
   "registro_fotos": []
